@@ -1,0 +1,54 @@
+{{template "header" .}}
+        <section class="editor-toolbar">
+            <div class="editor-info">
+                <p class="eyebrow">编辑</p>
+                <h1 class="page-title"><code id="editor-path">{{.FilePath}}</code></h1>
+            </div>
+            <div class="editor-actions">
+                <div class="url-field url-field--compact">
+                    <input type="text" class="url-input" id="editor-raw-url" readonly onclick="this.select()" aria-label="Raw URL">
+                    <button type="button" class="btn btn-ghost btn-sm copy-btn" id="editor-copy-url">复制</button>
+                </div>
+                <div class="editor-btn-group">
+                    <button type="button" class="btn btn-secondary btn-sm" id="validate-btn">校验</button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="history-btn">历史</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="save-btn">保存</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="editor-section">
+            <div class="editor-wrap">
+                <div class="editor-gutter" aria-hidden="true">surge</div>
+                <pre class="editor-highlight" aria-hidden="true"><code id="highlight-code"></code></pre>
+                <textarea id="editor" class="editor-input" spellcheck="false" aria-label="文件内容"></textarea>
+            </div>
+            <div class="editor-foot">
+                <p class="editor-status muted" id="editor-status">加载中…</p>
+                <span class="editor-hint muted">⌘S / Ctrl+S 保存</span>
+            </div>
+            <div id="validation-panel" class="validation-panel hidden"></div>
+        </section>
+
+        <div id="history-modal" class="modal hidden" role="dialog" aria-modal="true">
+            <div class="modal-backdrop"></div>
+            <div class="modal-card modal-wide">
+                <div class="modal-head">
+                    <h3>版本历史</h3>
+                </div>
+                <div id="history-list" class="history-list"></div>
+                <button type="button" class="btn btn-secondary" id="history-close">关闭</button>
+            </div>
+        </div>
+{{template "footer" .}}
+<script>
+    window.EDITOR_PATH = {{printf "%q" .FilePath}};
+</script>
+<script src="/static/js/editor.js"></script>
+<script>
+document.getElementById('editor-copy-url')?.addEventListener('click', () => {
+  const input = document.getElementById('editor-raw-url');
+  navigator.clipboard.writeText(input.value);
+  App.toast('已复制 Raw URL', 'success');
+});
+</script>

@@ -1,0 +1,101 @@
+{{template "header" .}}
+        <section class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow">Surge 配置托管</p>
+                <h1 class="hero-title">上传规则，<br>一条 URL 订阅</h1>
+                <p class="hero-desc">托管 <code>.conf</code>、<code>.list</code>、<code>.module</code> 等文本配置，生成干净的 Raw URL，Surge 直接引用、自动更新。</p>
+                <div class="hero-actions">
+                    <a href="/upload" class="btn btn-primary">上传文件</a>
+                    <a href="/files" class="btn btn-secondary">管理文件</a>
+                </div>
+            </div>
+            <div class="hero-panel">
+                <div class="panel-label">Raw URL 格式</div>
+                <pre class="code-block"><span class="hl-comment"># 在 Surge 配置中引用</span>
+[Rule]
+RULE-SET,{{.RawBase}}/<span class="hl-keyword">user</span>/<span class="hl-keyword">filename</span>,proxy
+DOMAIN-SET,{{.RawBase}}/<span class="hl-keyword">user</span>/domains.list</pre>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-value">{{len .Files}}</span>
+                        <span class="stat-label">公开文件</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">{{.Domain}}</span>
+                        <span class="stat-label">服务域名</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="steps-section">
+            <h2 class="section-title">使用流程</h2>
+            <ol class="steps">
+                <li class="step-card">
+                    <span class="step-num">1</span>
+                    <div>
+                        <h3>上传配置</h3>
+                        <p>将规则集或配置文件上传到您的用户目录，支持拖拽上传。</p>
+                    </div>
+                </li>
+                <li class="step-card">
+                    <span class="step-num">2</span>
+                    <div>
+                        <h3>复制 Raw URL</h3>
+                        <p>格式为 <code>{{.RawBase}}/{user}/{filename}</code>，纯文本直出。</p>
+                    </div>
+                </li>
+                <li class="step-card">
+                    <span class="step-num">3</span>
+                    <div>
+                        <h3>Surge 引用</h3>
+                        <p>在配置中使用 <code>RULE-SET</code> 或 <code>DOMAIN-SET</code> 引用，自动拉取更新。</p>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        <section class="files-section">
+            <div class="section-head">
+                <h2 class="section-title">公开规则集</h2>
+                <p class="muted">所有已上传文件的 Raw URL 一览</p>
+            </div>
+            {{if .Files}}
+            <div class="file-grid">
+                {{range .Files}}
+                <article class="file-card">
+                    <div class="file-card-head">
+                        <div class="file-meta">
+                            <span class="file-user">{{.User}}</span>
+                            <code class="file-name">{{.Name}}</code>
+                        </div>
+                        <span class="file-size">{{.Size}} B</span>
+                    </div>
+                    <div class="file-card-foot">
+                        <time class="file-time muted">{{.Modified}}</time>
+                        <div class="url-field">
+                            <input type="text" class="url-input" readonly value="{{.RawURL}}" onclick="this.select()" aria-label="Raw URL">
+                            <button type="button" class="btn btn-ghost btn-sm copy-btn" data-copy="{{.RawURL}}">复制</button>
+                        </div>
+                    </div>
+                </article>
+                {{end}}
+            </div>
+            {{else}}
+            <div class="empty-state">
+                <p>暂无公开文件</p>
+                <a href="/upload" class="btn btn-secondary btn-sm">立即上传</a>
+            </div>
+            {{end}}
+        </section>
+{{template "footer" .}}
+<script>
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    navigator.clipboard.writeText(btn.dataset.copy).then(() => {
+      btn.textContent = '已复制';
+      setTimeout(() => { btn.textContent = '复制'; }, 1500);
+    });
+  });
+});
+</script>

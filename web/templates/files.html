@@ -1,0 +1,68 @@
+{{template "header" .}}
+        <section class="page-head">
+            <div>
+                <p class="eyebrow">管理</p>
+                <h1 class="page-title">文件管理</h1>
+                <p class="muted">浏览、编辑、复制 Raw URL 或删除已上传的配置</p>
+            </div>
+            <a href="/upload" class="btn btn-primary">+ 上传新文件</a>
+        </section>
+
+        <section class="files-panel">
+            <div id="files-loading" class="state-box">
+                <span class="spinner" aria-hidden="true"></span>
+                加载中…
+            </div>
+            <div id="files-empty" class="empty-state hidden">
+                <p>暂无文件</p>
+                <a href="/upload" class="btn btn-secondary btn-sm">立即上传</a>
+            </div>
+            <div class="table-wrap hidden" id="files-table-wrap">
+                <table class="file-table" id="files-table">
+                    <thead>
+                        <tr>
+                            <th>文件</th>
+                            <th>大小</th>
+                            <th>更新</th>
+                            <th>Raw URL</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="files-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <div id="rename-modal" class="modal hidden" role="dialog" aria-modal="true">
+            <div class="modal-backdrop"></div>
+            <div class="modal-card">
+                <div class="modal-head">
+                    <h3>重命名文件</h3>
+                </div>
+                <form id="rename-form" class="stack-form">
+                    <input type="hidden" id="rename-old">
+                    <label class="field">
+                        <span class="field-label">新路径</span>
+                        <input type="text" id="rename-new" required>
+                    </label>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="rename-cancel">取消</button>
+                        <button type="submit" class="btn btn-primary">确认</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="history-modal" class="modal hidden" role="dialog" aria-modal="true">
+            <div class="modal-backdrop"></div>
+            <div class="modal-card modal-wide">
+                <div class="modal-head">
+                    <h3>版本历史</h3>
+                    <p class="muted"><code id="history-path"></code></p>
+                </div>
+                <div id="history-list" class="history-list"></div>
+                <button type="button" class="btn btn-secondary" id="history-close">关闭</button>
+            </div>
+        </div>
+{{template "footer" .}}
+<script src="/static/js/files.js"></script>

@@ -1,0 +1,40 @@
+{{template "header" .}}
+        <section class="page-head">
+            <div>
+                <p class="eyebrow">上传</p>
+                <h1 class="page-title">添加配置文件</h1>
+                <p class="muted">支持 {{.AllowedExts}}，单文件最大 {{.MaxFileSize}} 字节</p>
+            </div>
+        </section>
+
+        <section class="upload-layout">
+            <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="拖拽或选择文件上传">
+                <div class="dropzone-icon" aria-hidden="true">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M20 28V12M20 12l-6 6M20 12l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="4" width="32" height="32" rx="8" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4"/></svg>
+                </div>
+                <p class="dropzone-title">拖拽文件到此处</p>
+                <p class="muted">或点击选择本地文件</p>
+                <input type="file" id="file-input" accept="{{.AllowedExts}}" hidden>
+                <button type="button" class="btn btn-secondary" id="pick-btn">选择文件</button>
+            </div>
+
+            <form id="upload-form" class="upload-form card-panel">
+                <label class="field">
+                    <span class="field-label">保存路径</span>
+                    <span class="field-hint muted">留空则使用原文件名</span>
+                    <input type="text" id="upload-path" placeholder="例如 rules.list 或 subdir/rules.list">
+                </label>
+                <div id="upload-preview" class="upload-preview hidden">
+                    <div class="preview-icon" aria-hidden="true">📄</div>
+                    <div>
+                        <span id="preview-name" class="preview-name"></span>
+                        <span id="preview-size" class="muted"></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" id="upload-btn" disabled>开始上传</button>
+            </form>
+
+            <div id="upload-result" class="result-box card-panel hidden"></div>
+        </section>
+{{template "footer" .}}
+<script src="/static/js/upload.js"></script>
