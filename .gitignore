@@ -1,0 +1,47 @@
+# Binaries
+/bin/
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test
+*.test
+*.out
+coverage.html
+
+# Go workspace
+go.work
+go.work.sum
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (user uploads - keep structure via .gitkeep)
+/data/users/*
+!/data/users/.gitkeep
+/data/*.db
+/data/*.db-*
+/data/repos/
+
+# Env & secrets（只提交 .env.example）
+.env
+.env.*
+!.env.example
+.env.local
+*.pem
+*.key
+credentials.json
+
+# Logs
+*.log

@@ -1,0 +1,25 @@
+# Git
+.git
+.gitignore
+
+# Build artifacts
+bin/*
+!bin/surge-host
+dist/
+
+# Runtime data (mounted as volume)
+data/
+
+# IDE & OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Env & logs
+.env
+.env.*
+*.log
+
+# Docs (not needed in image)
+README.md
