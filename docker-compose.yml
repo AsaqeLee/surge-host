@@ -1,0 +1,47 @@
+networks:
+    1panel-network:
+        external: true
+
+services:
+    surge-host:
+        build:
+            context: .
+            dockerfile: Dockerfile.release
+        image: surge-host:latest
+        container_name: ${CONTAINER_NAME}
+        restart: always
+        labels:
+            createdBy: Apps
+        networks:
+            - 1panel-network
+        ports:
+            - ${HOST_IP}:${PANEL_APP_PORT_HTTP}:8080
+        volumes:
+            - ./data:/app/data
+        environment:
+            SURGE_HOST_PORT: "8080"
+            SURGE_HOST_DATA_DIR: /app/data
+            SURGE_HOST_STATIC_DIR: /app/web/static
+            SURGE_HOST_TEMPLATES_DIR: /app/web/templates
+            SURGE_HOST_DOMAIN: ${SURGE_HOST_DOMAIN:-rules.asaqe.site}
+            SURGE_HOST_ADMIN_USER: ${SURGE_HOST_ADMIN_USER:-admin}
+            SURGE_HOST_ADMIN_PASSWORD: ${SURGE_HOST_ADMIN_PASSWORD}
+            SURGE_HOST_JWT_SECRET: ${SURGE_HOST_JWT_SECRET}
+            SURGE_HOST_MAX_FILE_SIZE: ${SURGE_HOST_MAX_FILE_SIZE:-5242880}
+            SURGE_HOST_GIT_ENABLED: ${SURGE_HOST_GIT_ENABLED:-true}
+            SURGE_HOST_GIT_AUTHOR_NAME: ${SURGE_HOST_GIT_AUTHOR_NAME:-surge-host}
+            SURGE_HOST_GIT_AUTHOR_EMAIL: ${SURGE_HOST_GIT_AUTHOR_EMAIL:-surge-host@asaqe.site}
+            SURGE_HOST_VALIDATE_ENABLED: ${SURGE_HOST_VALIDATE_ENABLED:-true}
+            SURGE_HOST_VALIDATE_STRICT: ${SURGE_HOST_VALIDATE_STRICT:-false}
+            SURGE_HOST_CORS_ORIGINS: ${SURGE_HOST_CORS_ORIGINS:-}
+        deploy:
+            resources:
+                limits:
+                    cpus: ${CPUS}
+                    memory: ${MEMORY_LIMIT}
+        healthcheck:
+            test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 10s
