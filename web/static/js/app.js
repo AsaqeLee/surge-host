@@ -1,6 +1,7 @@
 /* surge-host — shared utilities */
 const App = (() => {
   const TOKEN_KEY = 'surge_host_token';
+  const THEME_KEY = 'surge_host_theme';
   const authEnabled = document.body.dataset.authEnabled === 'true';
   const adminUser = document.body.dataset.adminUser || 'admin';
 
@@ -16,6 +17,19 @@ const App = (() => {
   function clearToken() {
     localStorage.removeItem(TOKEN_KEY);
     updateAuthUI();
+  }
+
+  function theme() {
+    return document.documentElement.dataset.theme || 'dark';
+  }
+
+  function setTheme(t) {
+    document.documentElement.dataset.theme = t;
+    localStorage.setItem(THEME_KEY, t);
+  }
+
+  function toggleTheme() {
+    setTheme(theme() === 'dark' ? 'light' : 'dark');
   }
 
   function updateAuthUI() {
@@ -151,6 +165,7 @@ const App = (() => {
   document.addEventListener('DOMContentLoaded', () => {
     updateAuthUI();
     bindLoginForm();
+    document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
   });
 
   function showValidationIssues(container, validation) {
