@@ -1,6 +1,6 @@
 # surge-host
 
-**自托管 Surge 规则与配置文件托管服务 — 上传、版本管理、语法校验，通过 Raw URL 一键订阅。**
+**自托管多平台代理配置托管服务 — 上传、版本管理、语法校验，通过 Raw URL 统一分发 Surge、Meta/Mihomo、sing-box 等配置文件。**
 
 📖 [English README](README.md)
 
@@ -12,17 +12,17 @@ https://your-domain.com/raw/{user}/{filename}
 
 ## 它解决什么问题？
 
-Surge 的 `RULE-SET`、`DOMAIN-SET` 需要一条**稳定、纯文本、可直接拉取**的 HTTP 地址：
+规则与代理配置通常需要一条**稳定、纯文本、可直接拉取**的 HTTP 地址：
 
 - 返回内容必须是 `text/plain`，不能带 HTML 包装
-- 读端应对 Surge 开放，写端应受控
-- 规则更新后，Surge 能自动同步，无需手动改本地文件
+- 读端应对客户端或同步脚本开放，写端应受控
+- 规则或配置更新后，客户端能自动同步，无需手动改本地文件
 
 **surge-host** 把这件事做成一套轻量私有服务：
 
 | 能力 | 说明 |
 |------|------|
-| Raw URL | 纯文本输出，Surge 直接解析 |
+| Raw URL | 纯文本输出，适合规则集、YAML、JSON 等配置直接拉取 |
 | Web 管理 | 上传、列表、在线编辑 |
 | Git 版本控制 | 按文件追踪历史，预览与回滚 |
 | 语法校验 | 上线前拦截明显错误 |
@@ -30,11 +30,11 @@ Surge 的 `RULE-SET`、`DOMAIN-SET` 需要一条**稳定、纯文本、可直接
 
 ---
 
-## 为什么比 GitHub Gist / 静态 Nginx 更适合 Surge？
+## 为什么比 GitHub Gist / 静态 Nginx 更适合配置托管？
 
 | | GitHub Gist | 静态 Nginx | **surge-host** |
 |---|---|---|---|
-| 纯文本 Raw 输出 | ⚠️ 有包装 / 限流 | ✅ 需手动配置 | ✅ 专为 Surge 设计 |
+| 纯文本 Raw 输出 | ⚠️ 有包装 / 限流 | ✅ 需手动配置 | ✅ 面向多平台配置分发设计 |
 | 在线编辑 + 校验 | ❌ | ❌ | ✅ |
 | 版本历史与回滚 | ⚠️ 仅 Git 历史 | ❌ | ✅ 按文件管理 |
 | 多文件管理 | ❌ 一个 Gist 一个文件 | ⚠️ 手动维护目录 | ✅ UI + API |
@@ -45,7 +45,7 @@ Surge 的 `RULE-SET`、`DOMAIN-SET` 需要一条**稳定、纯文本、可直接
 
 **静态 Nginx** 能发文件，但编辑、版本、校验都要自己拼，每次改规则都要手动 `scp`。
 
-**surge-host** 是专为 Surge 订阅设计的中间方案：**读端像静态站一样干净，写端像小型规则后台一样完整。**
+**surge-host** 是面向多平台代理配置托管的中间方案：**读端像静态站一样干净，写端像小型配置后台一样完整。**
 
 ---
 
@@ -129,20 +129,19 @@ server {
 }
 ```
 
-### 第四步：接入 Surge
+### 第四步：接入客户端
 
-1. 打开 `https://rules.example.com` → 上传规则文件
+1. 打开 `https://rules.example.com` → 上传规则或配置文件
 2. 从管理页复制 Raw URL
-3. 写入 Surge 配置：
+3. 在客户端或同步脚本中引用：
 
-```ini
-[Rule]
-RULE-SET,https://rules.example.com/raw/admin/rules.list,PROXY
-DOMAIN-SET,https://rules.example.com/raw/admin/domains.list,PROXY
-FINAL,DIRECT
+```text
+https://rules.example.com/raw/admin/rules.list
+https://rules.example.com/raw/admin/meta.yaml
+https://rules.example.com/raw/admin/sing-box.json
 ```
 
-Surge 会定期拉取更新，**保存规则后无需手动同步。**
+保存后即可通过同一条 Raw URL 拉取新内容，适合 Surge、Meta/Mihomo、sing-box 或同步脚本统一消费。
 
 ---
 
@@ -152,7 +151,7 @@ Surge 会定期拉取更新，**保存规则后无需手动同步。**
 
 | 路径 | 说明 |
 |------|------|
-| `/` | 公开规则列表与快速入门 |
+| `/` | 公开配置列表与快速入门 |
 | `/upload` | 拖拽上传 |
 | `/files` | 文件管理（重命名、删除、历史） |
 | `/edit/{path}` | 在线编辑、语法高亮、校验 |
@@ -196,12 +195,18 @@ curl -X POST -H "Authorization: Bearer $TOKEN" \
 
 ### 语法校验
 
-对 `.list`、`.conf`、`.module` 文件进行校验：
+当前内置以下格式校验：
 
-- 逗号分隔规则格式
-- `.conf` 段名识别（`[Rule]`、`[General]` 等）
-- 常见规则类型：`DOMAIN-SUFFIX`、`RULE-SET`、`GEOIP`、`IP-CIDR`、`FINAL` 等
-- 严格模式（`SURGE_HOST_VALIDATE_STRICT=true`）将未知类型视为错误
+- Surge：`.list`、`.conf`、`.module`
+- Meta / Mihomo：`.yaml`、`.yml`
+- sing-box：`.json`
+
+其中：
+
+- Surge 校验规则行格式、常见规则类型与配置段结构
+- Meta / Mihomo 校验 YAML 语法，并检查 `proxies`、`proxy-groups`、`rules`、`rule-providers`、`payload` 等常见结构
+- sing-box 校验 JSON 语法，并检查 `inbounds`、`outbounds`、`route`、`dns`、`log` 等顶层结构
+- 严格模式（`SURGE_HOST_VALIDATE_STRICT=true`）会对未识别类型给出更严格提示
 
 编辑器内点 **校验**，或通过 API：
 
@@ -265,7 +270,7 @@ go run ./cmd/server
 | `SURGE_HOST_ADMIN_PASSWORD` | _(空)_ | 密码；为空则开发模式 |
 | `SURGE_HOST_JWT_SECRET` | `change-me-in-production` | JWT 密钥 |
 | `SURGE_HOST_MAX_FILE_SIZE` | `5242880` | 单文件上限（5 MB） |
-| `SURGE_HOST_ALLOWED_EXTENSIONS` | `.conf,.list,.txt,.module,.yaml,.yml` | 允许扩展名 |
+| `SURGE_HOST_ALLOWED_EXTENSIONS` | `.conf,.list,.txt,.module,.yaml,.yml,.json` | 允许扩展名 |
 | `SURGE_HOST_GIT_ENABLED` | `true` | Git 版本控制 |
 | `SURGE_HOST_VALIDATE_ENABLED` | `true` | 语法校验 |
 | `SURGE_HOST_VALIDATE_STRICT` | `false` | 严格校验 |
@@ -305,7 +310,7 @@ go run ./cmd/server
 surge-host/
 ├── cmd/server/           # 入口
 ├── internal/             # 核心业务逻辑
-├── pkg/validator/        # Surge 语法校验
+├── pkg/validator/        # 多格式配置校验
 ├── web/                  # 前端模板与静态资源
 ├── data/                 # 运行时数据（不提交）
 ├── Dockerfile

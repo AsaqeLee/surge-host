@@ -62,7 +62,7 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := pageData(h.cfg, r, h.auth, map[string]any{
-		"Title":     "Surge Host — 规则集云端托管",
+		"Title":     "Surge Host — 多平台代理配置托管",
 		"ActiveNav": "home",
 		"Files":     files,
 	})
@@ -72,4 +72,3 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.Error("render index failed", "error", err)
 	}
 }
-
