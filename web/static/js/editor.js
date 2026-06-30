@@ -7,15 +7,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   const validateBtn = document.getElementById('validate-btn');
   const validationPanel = document.getElementById('validation-panel');
   const rawUrlInput = document.getElementById('editor-raw-url');
+  const gutter = document.querySelector('.editor-gutter');
 
   let dirty = false;
   let original = '';
 
   await App.requireAuth();
+  if (gutter) {
+    gutter.textContent = App.detectEditorMode(path);
+  }
   await loadFile();
 
   function syncHighlight() {
-    highlight.innerHTML = App.highlightSurge(editor.value) + '\n';
+    highlight.innerHTML = App.highlightConfig(path, editor.value) + '\n';
   }
 
   function syncScroll() {

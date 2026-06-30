@@ -1,9 +1,9 @@
 {{template "header" .}}
         <section class="hero">
             <div class="hero-copy">
-                <p class="eyebrow">Surge 配置托管</p>
-                <h1 class="hero-title">上传规则，<br>一条 URL 订阅</h1>
-                <p class="hero-desc">托管 <code>.conf</code>、<code>.list</code>、<code>.module</code> 等文本配置，生成干净的 Raw URL，Surge 直接引用、自动更新。</p>
+                <p class="eyebrow">多平台配置托管</p>
+                <h1 class="hero-title">上传配置，<br>一条 URL 拉取</h1>
+                <p class="hero-desc">托管 <code>.conf</code>、<code>.list</code>、<code>.module</code>、<code>.yaml</code>、<code>.json</code> 等配置文件，生成干净的 Raw URL，适配 Surge、Meta/Mihomo、sing-box 与自动化同步脚本。</p>
                 <div class="hero-actions">
                     <a href="/upload" class="btn btn-primary">上传文件</a>
                     <a href="/files" class="btn btn-secondary">管理文件</a>
@@ -11,10 +11,10 @@
             </div>
             <div class="hero-panel">
                 <div class="panel-label">Raw URL 格式</div>
-                <pre class="code-block"><span class="hl-comment"># 在 Surge 配置中引用</span>
-[Rule]
-RULE-SET,{{.RawBase}}/<span class="hl-keyword">user</span>/<span class="hl-keyword">filename</span>,proxy
-DOMAIN-SET,{{.RawBase}}/<span class="hl-keyword">user</span>/domains.list</pre>
+                <pre class="code-block"><span class="hl-comment"># Raw URL 直接返回原始配置内容</span>
+{{.RawBase}}/<span class="hl-keyword">user</span>/rules.list
+{{.RawBase}}/<span class="hl-keyword">user</span>/meta.yaml
+{{.RawBase}}/<span class="hl-keyword">user</span>/sing-box.json</pre>
                 <div class="hero-stats">
                     <div class="stat">
                         <span class="stat-value">{{len .Files}}</span>
@@ -48,8 +48,8 @@ DOMAIN-SET,{{.RawBase}}/<span class="hl-keyword">user</span>/domains.list</pre>
                 <li class="step-card">
                     <span class="step-num">3</span>
                     <div>
-                        <h3>Surge 引用</h3>
-                        <p>在配置中使用 <code>RULE-SET</code> 或 <code>DOMAIN-SET</code> 引用，自动拉取更新。</p>
+                        <h3>客户端拉取</h3>
+                        <p>在 Surge、Meta/Mihomo、sing-box 或同步脚本中按需拉取，保持配置源统一。</p>
                     </div>
                 </li>
             </ol>
@@ -57,7 +57,7 @@ DOMAIN-SET,{{.RawBase}}/<span class="hl-keyword">user</span>/domains.list</pre>
 
         <section class="files-section">
             <div class="section-head">
-                <h2 class="section-title">公开规则集</h2>
+                <h2 class="section-title">公开配置文件</h2>
                 <p class="muted">所有已上传文件的 Raw URL 一览</p>
             </div>
             {{if .Files}}

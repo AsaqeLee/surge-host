@@ -114,6 +114,14 @@ const App = (() => {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+  function detectEditorMode(path = '') {
+    const lower = String(path).toLowerCase();
+    if (lower.endsWith('.json')) return 'json';
+    if (lower.endsWith('.yaml') || lower.endsWith('.yml')) return 'yaml';
+    if (lower.endsWith('.list') || lower.endsWith('.conf') || lower.endsWith('.module')) return 'surge';
+    return 'text';
+  }
+
   function highlightSurge(code) {
     let s = escapeHTML(code);
     // comments
@@ -126,6 +134,37 @@ const App = (() => {
     // URLs
     s = s.replace(/(https?:\/\/[^\s,]+)/g, '<span class="hl-url">$1</span>');
     return s;
+  }
+
+  function highlightYAML(code) {
+    let s = escapeHTML(code);
+    s = s.replace(/(#.*)$/gm, '<span class="hl-comment">$1</span>');
+    s = s.replace(/^(\s*-\s*)?([A-Za-z0-9_.-]+)(\s*:)/gm, (_, prefix = '', key, suffix) => {
+      return `${prefix}<span class="hl-keyword">${key}</span>${suffix}`;
+    });
+    s = s.replace(/(https?:\/\/[^\s'"]+)/g, '<span class="hl-url">$1</span>');
+    return s;
+  }
+
+  function highlightJSON(code) {
+    let s = escapeHTML(code);
+    s = s.replace(/("(?:\\.|[^"\\])*")(\s*:)/g, '<span class="hl-keyword">$1</span>$2');
+    s = s.replace(/:\s*("(?:\\.|[^"\\])*")/g, ': <span class="hl-url">$1</span>');
+    s = s.replace(/\b(true|false|null)\b/g, '<span class="hl-comment">$1</span>');
+    return s;
+  }
+
+  function highlightConfig(path, code) {
+    switch (detectEditorMode(path)) {
+      case 'json':
+        return highlightJSON(code);
+      case 'yaml':
+        return highlightYAML(code);
+      case 'surge':
+        return highlightSurge(code);
+      default:
+        return escapeHTML(code);
+    }
   }
 
   function bindLoginForm() {
@@ -196,7 +235,7 @@ const App = (() => {
 
   return {
     authEnabled, getToken, api, apiJSON, toast, formatSize,
-    highlightSurge, escapeHTML, requireAuth, showLogin,
+    detectEditorMode, highlightConfig, escapeHTML, requireAuth, showLogin,
     showValidationIssues, validateContent,
   };
 })();
