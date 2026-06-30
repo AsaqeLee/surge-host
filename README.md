@@ -1,17 +1,51 @@
 # surge-host
 
-A lightweight, version-controlled service for hosting, syncing, and validating Surge configuration and rule files. Built with Go for performance and reliability.
+A lightweight, self-hosted service for hosting, versioning, and validating proxy configuration files. Deliver Surge, Meta/Mihomo, and sing-box configs through stable Raw URLs.
+
+📖 [中文文档](README.zh-CN.md)
+
+```
+https://your-domain.com/raw/{user}/{filename}
+```
 
 ## Overview
 
-**surge-host** provides a centralized, private platform to manage your Surge rule sets and configurations. Unlike static file hosting, it integrates native version control (Git), syntax validation, and a dedicated web dashboard to ensure your network configurations are always correct and accessible.
+Proxy rules and client configs need a **stable, plain-text HTTP endpoint** — no HTML wrappers, controlled writes, and automatic sync on the client side.
 
-### Core Pillars
+**surge-host** provides a private platform for that workflow:
 
-- **🚀 Performance:** Low-latency delivery of raw text files, optimized for Surge's subscription model.
-- **🛡️ Validation:** Integrated syntax checker for Surge-specific rules (`RULE-SET`, `IP-CIDR`, etc.) to prevent configuration errors.
-- **📜 Versioning:** Built-in Git support tracks every change, enabling instant history viewing and one-click rollbacks.
-- **🖥️ Management:** A minimalist web interface featuring drag-and-drop uploads and an online editor with syntax highlighting.
+| Capability | Description |
+|------------|-------------|
+| Raw URL | Plain-text delivery for rule lists, YAML, JSON, and other config files |
+| Web UI | Upload, file list, online editor with syntax highlighting |
+| Git versioning | Per-file history, preview, and rollback |
+| Validation | Catch syntax and structural errors before they go live |
+| Docker | One-command deploy on NAS, VPS, or homelab |
+
+### Supported formats
+
+| Extension | Client / use case | Validation |
+|-----------|-------------------|------------|
+| `.list` | Surge rule sets | Rule-line syntax |
+| `.conf`, `.module` | Surge configuration | Section and rule checks |
+| `.yaml`, `.yml` | Meta / Mihomo | YAML syntax + structure |
+| `.json` | sing-box | JSON syntax + top-level structure |
+| `.txt` | Plain text | No validation |
+
+Validation is **format-level / heuristic**, not a full upstream schema parser.
+
+---
+
+## Why not GitHub Gist or static Nginx?
+
+| | GitHub Gist | Static Nginx | **surge-host** |
+|---|---|---|---|
+| Plain-text Raw output | ⚠️ Wrappers / rate limits | ✅ Manual setup | ✅ Built for config delivery |
+| Online edit + validation | ❌ | ❌ | ✅ |
+| Per-file history & rollback | ⚠️ Git history only | ❌ | ✅ |
+| Multi-file management | ❌ One file per Gist | ⚠️ Manual dirs | ✅ UI + API |
+| Private write, public read | ⚠️ Tokens / visibility | ⚠️ DIY | ✅ JWT admin, public Raw |
+| Multi-client workflow | ❌ | ❌ | ✅ Out of the box |
 
 ---
 
@@ -19,73 +53,90 @@ A lightweight, version-controlled service for hosting, syncing, and validating S
 
 | Component | Technology |
 | :--- | :--- |
-| **Backend** | Go (Golang) 1.22+ |
-| **Database** | SQLite (Embedded) |
-| **VCS** | Native Git Implementation |
-| **Frontend** | Go Templates + Vanilla JS |
+| **Backend** | Go 1.22+ |
+| **Database** | SQLite (embedded) |
+| **VCS** | Native Git |
+| **Frontend** | Go templates + vanilla JS |
 | **Deployment** | Docker & Docker Compose |
 
 ---
 
 ## Quick Start
 
-### Docker Deployment (Recommended)
-
-The simplest way to get started is via Docker Compose:
+### Docker (recommended)
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/AsaqeLee/surge-host.git
 cd surge-host
-
-# 2. Configure your environment
 cp .env.example .env
-# Edit .env with your domain and credentials
-
-# 3. Launch the service
+# Edit .env: domain, admin password, JWT secret
 docker compose up -d --build
 ```
 
-### Local Development
-
-Ensure you have Go 1.22+ and Git installed:
+### Local development
 
 ```bash
 go mod tidy
 go run ./cmd/server
 ```
-The server will be available at `http://localhost:8080` by default.
+
+Default: `http://localhost:8080`
 
 ---
 
 ## Configuration
 
-Surge-host is configured via environment variables. Key parameters include:
+Key environment variables:
 
-- `SURGE_HOST_DOMAIN`: The domain used to generate raw URLs.
-- `SURGE_HOST_ADMIN_PASSWORD`: Enables authentication for the dashboard and API.
-- `SURGE_HOST_GIT_ENABLED`: Toggles the internal Git versioning system.
-- `SURGE_HOST_ALLOWED_EXTENSIONS`: Restricts file types (Default: `.conf, .list, .txt, .module, .yaml`).
+| Variable | Description |
+|----------|-------------|
+| `SURGE_HOST_DOMAIN` | Public domain for Raw URL generation |
+| `SURGE_HOST_ADMIN_USER` | Dashboard admin username |
+| `SURGE_HOST_ADMIN_PASSWORD` | Admin password (enables auth) |
+| `SURGE_HOST_JWT_SECRET` | JWT signing secret |
+| `SURGE_HOST_ALLOWED_EXTENSIONS` | Allowed file types (default includes `.json`) |
+| `SURGE_HOST_VALIDATE_ENABLED` | Toggle syntax validation |
+| `SURGE_HOST_GIT_ENABLED` | Toggle Git versioning |
+
+See `.env.example` for the full list.
 
 ---
 
-## API & Integration
+## Integration
 
-### Raw URL Subscription
-In Surge, reference your hosted files using the following format:
-```ini
-[Rule]
-RULE-SET,https://your-domain.com/raw/admin/proxy.list,PROXY
+### Raw URL examples
+
+```text
+https://your-domain.com/raw/user/rules.list
+https://your-domain.com/raw/user/meta.yaml
+https://your-domain.com/raw/user/sing-box.json
 ```
 
+**Surge** — reference in `surge.conf`:
+
+```ini
+[Rule]
+RULE-SET,https://your-domain.com/raw/user/rules.list,PROXY
+```
+
+**Meta / Mihomo** — use the Raw URL in `rule-providers` or subscription fields.
+
+**sing-box** — point your client or sync script at the Raw JSON URL.
+
 ### REST API
-Comprehensive endpoints for automation:
-- `GET /api/files`: List managed files.
-- `POST /api/validate`: Dry-run validation of Surge syntax.
-- `GET /api/git/log/{path}`: Access full version history.
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/files` | List files |
+| `POST /api/files` | Upload (multipart) |
+| `PUT /api/files/{path}` | Replace content |
+| `POST /api/validate` | Dry-run validation |
+| `GET /api/git/log/{path}` | Version history |
+
+Authenticated endpoints require `Authorization: Bearer <token>` from `POST /api/auth/login`.
 
 ---
 
 ## License
 
-Distributed under the [MIT License](LICENSE). Built by [Asaqe Lee](https://asaqe.org).
+[MIT License](LICENSE) · [Asaqe Lee](https://asaqe.org)

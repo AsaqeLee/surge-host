@@ -6,6 +6,34 @@ import (
 	"strings"
 )
 
+// NormalizeUserPath strips a single leading "{username}/" prefix if present.
+// Only the first path segment is considered; interior segments are untouched.
+func NormalizeUserPath(username, rel string) string {
+	if username == "" || rel == "" {
+		return rel
+	}
+	rel = filepath.ToSlash(filepath.Clean(rel))
+	prefix := username + "/"
+	if strings.HasPrefix(rel, prefix) {
+		return rel[len(prefix):]
+	}
+	return rel
+}
+
+// PrepareUserPath trims, cleans, strips a leading username prefix, and validates.
+func PrepareUserPath(username, rel string) (string, error) {
+	rel = strings.TrimSpace(rel)
+	if rel == "" {
+		return "", fmt.Errorf("empty path")
+	}
+	rel = filepath.ToSlash(filepath.Clean(rel))
+	rel = NormalizeUserPath(username, rel)
+	if err := Validate(rel); err != nil {
+		return "", err
+	}
+	return rel, nil
+}
+
 // Validate ensures the relative path is safe (no traversal, no absolute paths).
 func Validate(rel string) error {
 	if rel == "" {

@@ -6,7 +6,6 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"path/filepath"
 	"strings"
 
 	"github.com/asaqe/surge-host/internal/auth"
@@ -145,8 +144,8 @@ func (h *FileAPIHandler) Upload(w http.ResponseWriter, r *http.Request) {
 	if relPath == "" {
 		relPath = header.Filename
 	}
-	relPath = filepath.ToSlash(filepath.Clean(relPath))
-	if err := safepath.Validate(relPath); err != nil {
+	relPath, err = safepath.PrepareUserPath(username, relPath)
+	if err != nil {
 		response.Error(w, http.StatusBadRequest, "invalid path")
 		return
 	}
@@ -226,12 +225,8 @@ func (h *FileAPIHandler) Rename(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newPath := filepath.ToSlash(filepath.Clean(strings.TrimSpace(req.NewPath)))
-	if newPath == "" || newPath == "." {
-		response.Error(w, http.StatusBadRequest, "new_path is required")
-		return
-	}
-	if err := safepath.Validate(newPath); err != nil {
+	newPath, err := safepath.PrepareUserPath(username, req.NewPath)
+	if err != nil {
 		response.Error(w, http.StatusBadRequest, "invalid new_path")
 		return
 	}
