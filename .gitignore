@@ -45,3 +45,7 @@ credentials.json
 
 # Logs
 *.log
+
+# Local docs & analysis (not versioned)
+/docs/
+/evidence/
