@@ -38,7 +38,7 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("invalid SURGE_HOST_MAX_FILE_SIZE: %w", err)
 	}
 
-	exts := envString("SURGE_HOST_ALLOWED_EXTENSIONS", ".conf,.list,.txt,.module,.yaml,.yml")
+	exts := envString("SURGE_HOST_ALLOWED_EXTENSIONS", ".conf,.list,.txt,.module,.yaml,.yml,.json")
 	allowed := make(map[string]bool)
 	for _, ext := range strings.Split(exts, ",") {
 		ext = strings.TrimSpace(strings.ToLower(ext))
