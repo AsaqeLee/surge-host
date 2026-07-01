@@ -14,7 +14,11 @@ import (
 // History handles GET /api/git/log/{path...}.
 func (h *FileAPIHandler) History(w http.ResponseWriter, r *http.Request) {
 	username, _ := auth.UsernameFromContext(r.Context())
-	relPath := r.PathValue("path")
+	relPath, err := userPathFromRequest(username, r.PathValue("path"))
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, "invalid path")
+		return
+	}
 
 	if !h.store.VCS().Enabled() {
 		response.Error(w, http.StatusServiceUnavailable, "git versioning is disabled")
@@ -45,7 +49,11 @@ func (h *FileAPIHandler) History(w http.ResponseWriter, r *http.Request) {
 // ShowVersion handles GET /api/git/show/{path...}?commit=hash.
 func (h *FileAPIHandler) ShowVersion(w http.ResponseWriter, r *http.Request) {
 	username, _ := auth.UsernameFromContext(r.Context())
-	relPath := r.PathValue("path")
+	relPath, err := userPathFromRequest(username, r.PathValue("path"))
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, "invalid path")
+		return
+	}
 	commit := r.URL.Query().Get("commit")
 
 	if !h.store.VCS().Enabled() {
@@ -83,7 +91,11 @@ type restoreRequest struct {
 // Restore handles POST /api/git/restore/{path...}.
 func (h *FileAPIHandler) Restore(w http.ResponseWriter, r *http.Request) {
 	username, _ := auth.UsernameFromContext(r.Context())
-	relPath := r.PathValue("path")
+	relPath, err := userPathFromRequest(username, r.PathValue("path"))
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, "invalid path")
+		return
+	}
 
 	if !h.store.VCS().Enabled() {
 		response.Error(w, http.StatusServiceUnavailable, "git versioning is disabled")

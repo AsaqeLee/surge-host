@@ -44,6 +44,11 @@ func New(cfg *config.Config) (*Server, error) {
 	authSvc := auth.NewService(cfg.JWTSecret, cfg.AdminUser, cfg.AdminPassword)
 	if !authSvc.AuthEnabled() {
 		slog.Warn("authentication disabled — set SURGE_HOST_ADMIN_PASSWORD to enable")
+	} else {
+		warnInsecureAuth(cfg)
+	}
+	if cfg.JWTSecret == "change-me-in-production" {
+		slog.Warn("using default JWT secret — set SURGE_HOST_JWT_SECRET to a random value")
 	}
 
 	home, err := handler.NewHomeHandler(cfg, authSvc, fileStore)
@@ -138,6 +143,15 @@ func (s *Server) Close() error {
 		return s.db.Close()
 	}
 	return nil
+}
+
+func warnInsecureAuth(cfg *config.Config) {
+	if len(cfg.AdminPassword) < 12 {
+		slog.Warn("admin password is short — use at least 12 characters")
+	}
+	if cfg.AdminPassword == cfg.AdminUser {
+		slog.Warn("admin password equals username — use a distinct strong password")
+	}
 }
 
 func ensureDirs(cfg *config.Config) error {

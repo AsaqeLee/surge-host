@@ -9,6 +9,7 @@ import (
 	"github.com/asaqe/surge-host/internal/auth"
 	"github.com/asaqe/surge-host/internal/store"
 	"github.com/asaqe/surge-host/pkg/response"
+	"github.com/asaqe/surge-host/pkg/safepath"
 	"github.com/asaqe/surge-host/pkg/validator"
 )
 
@@ -25,9 +26,10 @@ func (h *FileAPIHandler) Validate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := strings.TrimSpace(req.Path)
-	if path == "" {
-		response.Error(w, http.StatusBadRequest, "path is required")
+	username, _ := auth.UsernameFromContext(r.Context())
+	path, err := safepath.PrepareUserPath(username, strings.TrimSpace(req.Path))
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, "invalid path")
 		return
 	}
 
@@ -35,7 +37,6 @@ func (h *FileAPIHandler) Validate(w http.ResponseWriter, r *http.Request) {
 	if req.Content != "" {
 		content = []byte(req.Content)
 	} else {
-		username, _ := auth.UsernameFromContext(r.Context())
 		data, err := h.store.ReadContent(username, path)
 		if err != nil {
 			if store.IsNotFound(err) {

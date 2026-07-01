@@ -62,7 +62,7 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := pageData(h.cfg, r, h.auth, map[string]any{
-		"Title":     "Surge Host — 多平台代理配置托管",
+		"Title":     "Rules",
 		"ActiveNav": "home",
 		"Files":     files,
 	})

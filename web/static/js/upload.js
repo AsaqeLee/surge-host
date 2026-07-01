@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!selectedFile) return;
 
     uploadBtn.disabled = true;
-    uploadBtn.textContent = '上传中…';
+    uploadBtn.textContent = 'Uploading…';
 
     const fd = new FormData();
     fd.append('file', selectedFile);
@@ -68,31 +68,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (res.status === 422 && data.validation) {
         resultBox.classList.remove('hidden');
         App.showValidationIssues(resultBox, data.validation);
-        throw new Error('语法校验未通过');
+        throw new Error('Validation failed');
       }
-      if (!res.ok) throw new Error(data.error || '上传失败');
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
 
       resultBox.classList.remove('hidden');
       resultBox.innerHTML = `
-        <p class="result-success">上传成功</p>
+        <p class="result-success">Upload complete</p>
         <div class="url-field">
-          <input class="url-input" readonly value="${App.escapeHTML(data.raw_url)}" onclick="this.select()">
-          <button type="button" class="btn btn-ghost btn-sm" id="result-copy">复制</button>
+          <input class="url-input" readonly value="${App.escapeHTML(data.raw_url)}" title="Right-click to copy Raw URL" onclick="this.select()">
+          <button type="button" class="btn btn-ghost btn-sm copy-btn" id="result-copy">Copy</button>
         </div>
         <div class="result-actions">
-          <a href="/edit/${encodeURI(data.path)}" class="btn btn-secondary btn-sm">编辑</a>
-          <a href="/files" class="btn btn-primary btn-sm">文件列表</a>
+          <a href="/edit/${encodeURI(data.path)}" class="btn btn-secondary btn-sm">Edit</a>
+          <a href="/files" class="btn btn-primary btn-sm">Manage</a>
         </div>`;
-      document.getElementById('result-copy')?.addEventListener('click', () => {
-        navigator.clipboard.writeText(data.raw_url);
-        App.toast('已复制 Raw URL', 'success');
-      });
-      App.toast('上传成功', 'success');
+      App.toast('Upload complete', 'success');
     } catch (err) {
       App.toast(err.message, 'error');
     } finally {
       uploadBtn.disabled = false;
-      uploadBtn.textContent = '上传';
+      uploadBtn.textContent = 'Upload';
     }
   });
 });

@@ -1,10 +1,12 @@
 {{define "header"}}
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark light">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#fafafa">
+    <meta name="description" content="Multi-platform configuration hosting for Surge, Meta/Mihomo, and sing-box.">
     <title>{{.Title}}</title>
     <script>
     (function(){
@@ -16,53 +18,53 @@
     <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/system.css">
 </head>
 <body data-auth-enabled="{{.AuthEnabled}}" data-admin-user="{{.AdminUser}}">
-    <div class="app-bg" aria-hidden="true"></div>
     <header class="site-header">
-        <div class="container header-inner">
+        <div class="header-inner">
             <a href="/" class="brand">
-                <span class="brand-mark" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="2" width="24" height="24" rx="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 14h12M14 8v12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                </span>
-                <span class="brand-text">
-                    <span class="brand-name">Surge Host</span>
-                    <span class="brand-tag">多平台代理配置托管</span>
-                </span>
+                <span class="brand-mark" aria-hidden="true">R</span>
+                <span class="brand-name">rules</span>
             </a>
-            <nav class="site-nav" aria-label="主导航">
-                <a href="/" class="nav-link{{if eq .ActiveNav "home"}} is-active{{end}}">
-                    <span class="nav-index">01</span>首页
-                </a>
-                <a href="/upload" class="nav-link{{if eq .ActiveNav "upload"}} is-active{{end}}">
-                    <span class="nav-index">02</span>上传
-                </a>
-                <a href="/files" class="nav-link{{if eq .ActiveNav "files"}} is-active{{end}}">
-                    <span class="nav-index">03</span>管理
-                </a>
+            <nav class="site-nav" aria-label="Main navigation">
+                <a href="/" class="nav-link{{if eq .ActiveNav "home"}} is-active{{end}}">[ Home ]</a>
+                {{if ne .ActiveNav "home"}}
+                <a href="/upload" class="nav-link{{if eq .ActiveNav "upload"}} is-active{{end}}">[ Upload ]</a>
+                {{end}}
+                <a href="/files" class="nav-link{{if eq .ActiveNav "files"}} is-active{{end}}">[ Manage ]</a>
             </nav>
             <div class="header-tools">
+                <span class="header-version" aria-label="Build version">v2.4.1</span>
+                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <svg class="theme-icon-sun" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                    <span class="theme-label-sm" id="theme-label">Light</span>
+                </button>
                 <div class="auth-area" id="auth-area"></div>
-                <button type="button" class="theme-toggle" id="theme-toggle" aria-label="切换深色/浅色主题" title="切换主题">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M12 3a9 9 0 000 18V3z" fill="currentColor" opacity=".45"/><path d="M12 3v18" stroke="currentColor" stroke-width="1.5"/></svg>
+                <button type="button" class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Toggle navigation">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
                 </button>
             </div>
         </div>
+        <div class="mobile-nav" id="mobile-nav">
+            <a href="/" class="nav-link{{if eq .ActiveNav "home"}} is-active{{end}}">[ Home ]</a>
+            {{if ne .ActiveNav "home"}}
+            <a href="/upload" class="nav-link{{if eq .ActiveNav "upload"}} is-active{{end}}">[ Upload ]</a>
+            {{end}}
+            <a href="/files" class="nav-link{{if eq .ActiveNav "files"}} is-active{{end}}">[ Manage ]</a>
+        </div>
     </header>
-    <main class="page-main">
-        <div class="container">
-            <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+    <main class="page-shell">
+        <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 {{end}}
 
 {{define "footer"}}
-        </div>
     </main>
     <footer class="site-footer">
-        <div class="container footer-inner">
-            <p class="footer-copy">surge-host · 多格式配置托管</p>
-            <p class="footer-domain"><code>{{.Domain}}</code></p>
+        <div class="footer-inner">
+            <p class="footer-copy">[ RULES HOSTING SYSTEM v2.4.1 ]</p>
+            <p class="footer-domain">{{.Domain}}</p>
         </div>
     </footer>
 
@@ -70,19 +72,19 @@
         <div class="modal-backdrop"></div>
         <div class="modal-card">
             <div class="modal-head">
-                <h3 id="login-title">登录</h3>
-                <p class="muted">管理文件需要管理员凭据</p>
+                <h3 id="login-title">Sign In</h3>
+                <p class="muted">Administrator credentials required</p>
             </div>
             <form id="login-form" class="stack-form">
                 <label class="field">
-                    <span class="field-label">用户名</span>
-                    <input type="text" id="login-user" value="{{.AdminUser}}" autocomplete="username">
+                    <span class="field-label">Username</span>
+                    <input type="text" id="login-user" value="{{.AdminUser}}" autocomplete="username" class="input-industrial">
                 </label>
                 <label class="field">
-                    <span class="field-label">密码</span>
-                    <input type="password" id="login-pass" autocomplete="current-password">
+                    <span class="field-label">Password</span>
+                    <input type="password" id="login-pass" autocomplete="current-password" class="input-industrial">
                 </label>
-                <button type="submit" class="btn btn-primary btn-block">登录</button>
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
             </form>
         </div>
     </div>

@@ -42,6 +42,14 @@ func (h *RawHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	normalized, err := safepath.PrepareUserPath(user, filePath)
+	if err != nil {
+		slog.Warn("raw path rejected", "user", user, "path", filePath, "error", err)
+		http.Error(w, "Invalid path", http.StatusBadRequest)
+		return
+	}
+	filePath = normalized
+
 	if !safepath.AllowedExtension(filePath, h.cfg.AllowedExtensions) {
 		http.Error(w, "File type not allowed", http.StatusForbidden)
 		return

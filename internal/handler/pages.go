@@ -7,6 +7,7 @@ import (
 
 	"github.com/asaqe/surge-host/internal/auth"
 	"github.com/asaqe/surge-host/internal/config"
+	"github.com/asaqe/surge-host/pkg/safepath"
 )
 
 // PageHandler renders HTML management pages.
@@ -28,7 +29,7 @@ func NewPageHandler(cfg *config.Config, authSvc *auth.Service) (*PageHandler, er
 // Upload renders the file upload page.
 func (h *PageHandler) Upload(w http.ResponseWriter, r *http.Request) {
 	h.render(w, r, "upload.html", map[string]any{
-		"Title":     "上传文件",
+		"Title":     "Upload — Rules",
 		"ActiveNav": "upload",
 	})
 }
@@ -36,20 +37,20 @@ func (h *PageHandler) Upload(w http.ResponseWriter, r *http.Request) {
 // Files renders the file management page.
 func (h *PageHandler) Files(w http.ResponseWriter, r *http.Request) {
 	h.render(w, r, "files.html", map[string]any{
-		"Title":     "文件管理",
+		"Title":     "Manage — Rules",
 		"ActiveNav": "files",
 	})
 }
 
 // Edit renders the online editor page.
 func (h *PageHandler) Edit(w http.ResponseWriter, r *http.Request) {
-	filePath := r.PathValue("path")
-	if filePath == "" {
-		http.Error(w, "file path required", http.StatusBadRequest)
+	filePath, err := safepath.PrepareUserPath(h.cfg.AdminUser, r.PathValue("path"))
+	if err != nil {
+		http.Error(w, "invalid file path", http.StatusBadRequest)
 		return
 	}
 	h.render(w, r, "edit.html", map[string]any{
-		"Title":     "编辑 — " + filePath,
+		"Title":     "Edit — " + filePath,
 		"ActiveNav": "files",
 		"FilePath":  filePath,
 	})

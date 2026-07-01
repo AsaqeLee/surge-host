@@ -1,53 +1,70 @@
 {{template "header" .}}
-        <section class="page-head">
-            <div>
-                <p class="eyebrow">管理</p>
-                <h1 class="page-title">文件管理</h1>
-        <p class="muted">浏览、编辑、复制 Raw URL 或删除已上传的规则与配置</p>
+        <div class="shell">
+            <div class="page-back-bar">
+                <a href="/" class="page-back">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    Back
+                </a>
+                <div class="tech-divider"></div>
             </div>
-            <a href="/upload" class="btn btn-primary">+ 上传新文件</a>
-        </section>
 
-        <section class="files-panel">
-            <div id="files-loading" class="state-box">
-                <span class="spinner" aria-hidden="true"></span>
-                加载中…
-            </div>
-            <div id="files-empty" class="empty-state hidden">
-                <p>暂无文件</p>
-                <a href="/upload" class="btn btn-secondary btn-sm">立即上传</a>
-            </div>
-            <div class="table-wrap hidden" id="files-table-wrap">
-                <table class="file-table" id="files-table">
-                    <thead>
-                        <tr>
-                            <th>文件</th>
-                            <th>大小</th>
-                            <th>更新</th>
-                            <th>Raw URL</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="files-tbody"></tbody>
-                </table>
-            </div>
-        </section>
+            <section class="panel">
+                <div class="panel-hd">
+                    <span class="panel-id">MNG/01</span>
+                    <span class="panel-title">File Registry</span>
+                </div>
+                <div class="panel-body">
+                    <section class="page-head page-head-row">
+                        <div>
+                            <h1 class="page-title title-serif">Manage Files</h1>
+                            <p class="muted">Browse, edit, copy Raw URLs, or delete hosted configurations.</p>
+                        </div>
+                        <a href="/upload" class="btn btn-primary btn-sm">Upload</a>
+                    </section>
+
+                    <section class="files-panel">
+                        <div id="files-loading" class="state-box">
+                            <span class="spinner" aria-hidden="true"></span>
+                            Loading…
+                        </div>
+                        <div id="files-empty" class="empty-state hidden">
+                            <p>No files yet.</p>
+                            <a href="/upload" class="btn btn-secondary btn-sm">Upload</a>
+                        </div>
+                        <div class="table-wrap hidden" id="files-table-wrap">
+                            <table class="file-table" id="files-table">
+                                <thead>
+                                    <tr>
+                                        <th>File</th>
+                                        <th>Size</th>
+                                        <th>Updated</th>
+                                        <th>Raw URL</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="files-tbody"></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </section>
+        </div>
 
         <div id="rename-modal" class="modal hidden" role="dialog" aria-modal="true">
             <div class="modal-backdrop"></div>
             <div class="modal-card">
                 <div class="modal-head">
-                    <h3>重命名文件</h3>
+                    <h3>Rename File</h3>
                 </div>
                 <form id="rename-form" class="stack-form">
                     <input type="hidden" id="rename-old">
                     <label class="field">
-                        <span class="field-label">新路径</span>
-                        <input type="text" id="rename-new" required>
+                        <span class="field-label">New Path</span>
+                        <input type="text" id="rename-new" class="input-industrial" required>
                     </label>
                     <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" id="rename-cancel">取消</button>
-                        <button type="submit" class="btn btn-primary">确认</button>
+                        <button type="button" class="btn btn-secondary" id="rename-cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
                     </div>
                 </form>
             </div>
@@ -57,11 +74,11 @@
             <div class="modal-backdrop"></div>
             <div class="modal-card modal-wide">
                 <div class="modal-head">
-                    <h3>版本历史</h3>
+                    <h3>Version History</h3>
                     <p class="muted"><code id="history-path"></code></p>
                 </div>
                 <div id="history-list" class="history-list"></div>
-                <button type="button" class="btn btn-secondary" id="history-close">关闭</button>
+                <button type="button" class="btn btn-secondary" id="history-close">Close</button>
             </div>
         </div>
 {{template "footer" .}}

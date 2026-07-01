@@ -1,40 +1,55 @@
 {{template "header" .}}
-        <section class="page-head">
-            <div>
-                <p class="eyebrow">上传</p>
-                <h1 class="page-title">添加配置文件</h1>
-                <p class="muted">支持 {{.AllowedExts}}，单文件最大 {{.MaxFileSize}} 字节</p>
-            </div>
-        </section>
-
-        <section class="upload-layout">
-            <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="拖拽或选择文件上传">
-                <div class="dropzone-icon" aria-hidden="true">
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M20 28V12M20 12l-6 6M20 12l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="4" width="32" height="32" rx="8" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 4"/></svg>
-                </div>
-                <p class="dropzone-title">拖拽文件到此处</p>
-                <p class="muted">或点击选择本地文件</p>
-                <input type="file" id="file-input" accept="{{.AllowedExts}}" hidden>
-                <button type="button" class="btn btn-secondary" id="pick-btn">选择文件</button>
+        <div class="shell shell--narrow">
+            <div class="page-back-bar">
+                <a href="/" class="page-back">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    Back
+                </a>
+                <div class="tech-divider"></div>
             </div>
 
-            <form id="upload-form" class="upload-form card-panel">
-                <label class="field">
-                    <span class="field-label">保存路径</span>
-                    <span class="field-hint muted">留空则使用原文件名</span>
-                    <input type="text" id="upload-path" placeholder="例如 rules.list、meta.yaml 或 subdir/sing-box.json">
-                </label>
-                <div id="upload-preview" class="upload-preview hidden">
-                    <div class="preview-icon" aria-hidden="true">📄</div>
-                    <div>
-                        <span id="preview-name" class="preview-name"></span>
-                        <span id="preview-size" class="muted"></span>
-                    </div>
+            <section class="panel">
+                <div class="panel-hd">
+                    <span class="panel-id">UPL/01</span>
+                    <span class="panel-title">Upload</span>
                 </div>
-                <button type="submit" class="btn btn-primary" id="upload-btn" disabled>开始上传</button>
-            </form>
+                <div class="panel-body">
+                    <section class="page-head">
+                        <h1 class="page-title title-serif">Upload Configuration</h1>
+                        <p class="muted">Upload {{.AllowedExts}} files. Max {{.MaxFileSize}} bytes per file.</p>
+                    </section>
 
-            <div id="upload-result" class="result-box card-panel hidden"></div>
-        </section>
+                    <section class="upload-layout">
+                        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Drop or select files to upload">
+                            <div class="dropzone-icon" aria-hidden="true">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+                            </div>
+                            <p class="dropzone-title">Drop files here or click to browse</p>
+                            <p class="muted">{{.AllowedExts}} — max {{.MaxFileSize}} bytes</p>
+                            <input type="file" id="file-input" accept="{{.AllowedExts}}" hidden>
+                            <button type="button" class="btn btn-secondary" id="pick-btn">Browse</button>
+                        </div>
+
+                        <form id="upload-form" class="upload-form">
+                            <label class="field">
+                                <span class="field-label">Save Path</span>
+                                <span class="field-hint muted">Leave empty to use the original filename</span>
+                                <input type="text" id="upload-path" class="input-industrial" placeholder="e.g. rules.list, meta.yaml, subdir/sing-box.json">
+                            </label>
+                            <div id="upload-preview" class="upload-preview hidden">
+                                <div class="preview-icon" aria-hidden="true">FILE</div>
+                                <div>
+                                    <span id="preview-name" class="preview-name"></span>
+                                    <span id="preview-size" class="muted"></span>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block" id="upload-btn" disabled>Upload</button>
+                        </form>
+
+                        <div id="upload-result" class="result-box hidden"></div>
+                    </section>
+                </div>
+            </section>
+        </div>
 {{template "footer" .}}
 <script src="/static/js/upload.js"></script>

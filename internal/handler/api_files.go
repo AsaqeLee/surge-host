@@ -76,10 +76,18 @@ func (h *FileAPIHandler) List(w http.ResponseWriter, r *http.Request) {
 	response.JSON(w, http.StatusOK, map[string]any{"files": result})
 }
 
+func userPathFromRequest(username, raw string) (string, error) {
+	return safepath.PrepareUserPath(username, raw)
+}
+
 // Get handles GET /api/files/{path...}.
 func (h *FileAPIHandler) Get(w http.ResponseWriter, r *http.Request) {
 	username, _ := auth.UsernameFromContext(r.Context())
-	relPath := r.PathValue("path")
+	relPath, err := userPathFromRequest(username, r.PathValue("path"))
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, "invalid path")
+		return
+	}
 
 	rec, err := h.store.Get(username, relPath)
 	if err != nil {
@@ -167,9 +175,8 @@ func (h *FileAPIHandler) Upload(w http.ResponseWriter, r *http.Request) {
 // Update handles PUT /api/files/{path...} — replace file content.
 func (h *FileAPIHandler) Update(w http.ResponseWriter, r *http.Request) {
 	username, _ := auth.UsernameFromContext(r.Context())
-	relPath := r.PathValue("path")
-
-	if err := safepath.Validate(relPath); err != nil {
+	relPath, err := userPathFromRequest(username, r.PathValue("path"))
+	if err != nil {
 		response.Error(w, http.StatusBadRequest, "invalid path")
 		return
 	}
@@ -194,7 +201,11 @@ func (h *FileAPIHandler) Update(w http.ResponseWriter, r *http.Request) {
 // Delete handles DELETE /api/files/{path...}.
 func (h *FileAPIHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	username, _ := auth.UsernameFromContext(r.Context())
-	relPath := r.PathValue("path")
+	relPath, err := userPathFromRequest(username, r.PathValue("path"))
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, "invalid path")
+		return
+	}
 
 	if err := h.store.Delete(username, relPath); err != nil {
 		if store.IsNotFound(err) {
@@ -217,7 +228,11 @@ type renameRequest struct {
 // Rename handles PATCH /api/files/{path...}.
 func (h *FileAPIHandler) Rename(w http.ResponseWriter, r *http.Request) {
 	username, _ := auth.UsernameFromContext(r.Context())
-	oldPath := r.PathValue("path")
+	oldPath, err := userPathFromRequest(username, r.PathValue("path"))
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, "invalid path")
+		return
+	}
 
 	var req renameRequest
 	if err := json.NewDecoder(io.LimitReader(r.Body, 4096)).Decode(&req); err != nil {

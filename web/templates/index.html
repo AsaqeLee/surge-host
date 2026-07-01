@@ -1,101 +1,165 @@
 {{template "header" .}}
-        <section class="hero">
-            <div class="hero-copy">
-                <p class="eyebrow">多平台配置托管</p>
-                <h1 class="hero-title">上传配置，<br>一条 URL 拉取</h1>
-                <p class="hero-desc">托管 <code>.conf</code>、<code>.list</code>、<code>.module</code>、<code>.yaml</code>、<code>.json</code> 等配置文件，生成干净的 Raw URL，适配 Surge、Meta/Mihomo、sing-box 与自动化同步脚本。</p>
-                <div class="hero-actions">
-                    <a href="/upload" class="btn btn-primary">上传文件</a>
-                    <a href="/files" class="btn btn-secondary">管理文件</a>
-                </div>
-            </div>
-            <div class="hero-panel">
-                <div class="panel-label">Raw URL 格式</div>
-                <pre class="code-block"><span class="hl-comment"># Raw URL 直接返回原始配置内容</span>
-{{.RawBase}}/<span class="hl-keyword">user</span>/rules.list
-{{.RawBase}}/<span class="hl-keyword">user</span>/meta.yaml
-{{.RawBase}}/<span class="hl-keyword">user</span>/sing-box.json</pre>
-                <div class="hero-stats">
-                    <div class="stat">
-                        <span class="stat-value">{{len .Files}}</span>
-                        <span class="stat-label">公开文件</span>
+        <div class="shell">
+            <section class="dash-hero" aria-labelledby="dash-title">
+                <div class="panel dash-hero-product">
+                    <div class="panel-hd">
+                        <span class="panel-id">MOD/01</span>
+                        <span class="panel-title">Product</span>
                     </div>
-                    <div class="stat">
-                        <span class="stat-value">{{.Domain}}</span>
-                        <span class="stat-label">服务域名</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="steps-section">
-            <h2 class="section-title">使用流程</h2>
-            <ol class="steps">
-                <li class="step-card">
-                    <span class="step-num">1</span>
-                    <div>
-                        <h3>上传配置</h3>
-                        <p>将规则集或配置文件上传到您的用户目录，支持拖拽上传。</p>
-                    </div>
-                </li>
-                <li class="step-card">
-                    <span class="step-num">2</span>
-                    <div>
-                        <h3>复制 Raw URL</h3>
-                        <p>格式为 <code>{{.RawBase}}/{user}/{filename}</code>，纯文本直出。</p>
-                    </div>
-                </li>
-                <li class="step-card">
-                    <span class="step-num">3</span>
-                    <div>
-                        <h3>客户端拉取</h3>
-                        <p>在 Surge、Meta/Mihomo、sing-box 或同步脚本中按需拉取，保持配置源统一。</p>
-                    </div>
-                </li>
-            </ol>
-        </section>
-
-        <section class="files-section">
-            <div class="section-head">
-                <h2 class="section-title">公开配置文件</h2>
-                <p class="muted">所有已上传文件的 Raw URL 一览</p>
-            </div>
-            {{if .Files}}
-            <div class="file-grid">
-                {{range .Files}}
-                <article class="file-card">
-                    <div class="file-card-head">
-                        <div class="file-meta">
-                            <span class="file-user">{{.User}}</span>
-                            <code class="file-name">{{.Name}}</code>
-                        </div>
-                        <span class="file-size">{{.Size}} B</span>
-                    </div>
-                    <div class="file-card-foot">
-                        <time class="file-time muted">{{.Modified}}</time>
-                        <div class="url-field">
-                            <input type="text" class="url-input" readonly value="{{.RawURL}}" onclick="this.select()" aria-label="Raw URL">
-                            <button type="button" class="btn btn-ghost btn-sm copy-btn" data-copy="{{.RawURL}}">复制</button>
+                    <div class="panel-body">
+                        <p class="dash-kicker">RULES · CONFIG HOST</p>
+                        <h1 id="dash-title" class="dash-title title-serif">Configuration Hosting</h1>
+                        <p class="dash-lead">Host, manage, and serve proxy configuration rules for Surge, Meta/Mihomo, and sing-box.</p>
+                        <p class="dash-tagline">Upload once, pull from anywhere.</p>
+                        <div class="dash-actions">
+                            <a href="/upload" class="ctrl ctrl-fill">Upload Config</a>
+                            <a href="/files" class="ctrl">Manage Files</a>
                         </div>
                     </div>
-                </article>
-                {{end}}
-            </div>
-            {{else}}
-            <div class="empty-state">
-                <p>暂无公开文件</p>
-                <a href="/upload" class="btn btn-secondary btn-sm">立即上传</a>
-            </div>
-            {{end}}
-        </section>
+                </div>
+
+                <aside class="panel dash-readout" aria-label="System readout">
+                    <div class="panel-hd">
+                        <span class="panel-id">MOD/02</span>
+                        <span class="panel-title">System Readout</span>
+                        <span class="readout-status">STATUS <strong class="status-online">ONLINE</strong></span>
+                    </div>
+                    <div class="panel-body">
+                        <table class="readout-table">
+                            <tbody>
+                                <tr><th scope="row">Domain</th><td>{{.Domain}}</td></tr>
+                                <tr><th scope="row">Public Files</th><td class="readout-num">{{len .Files}}</td></tr>
+                                <tr><th scope="row">Admin User</th><td>{{.AdminUser}}</td></tr>
+                                <tr><th scope="row">Service</th><td>RAW / PLAINTEXT</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="endpoint-block">
+                            <span class="endpoint-label">Sample Endpoint</span>
+                            <div class="endpoint-row">
+                                <code class="endpoint-value">{{.RawBase}}/{{.AdminUser}}/rules.list</code>
+                                <button type="button" class="ctrl ctrl-sm copy-btn" data-copy="{{.RawBase}}/{{.AdminUser}}/rules.list">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </section>
+
+            <section class="panel dash-platforms" aria-labelledby="platforms-title">
+                <div class="panel-hd">
+                    <span class="panel-id">MOD/03</span>
+                    <span class="panel-title" id="platforms-title">Supported Platforms</span>
+                </div>
+                <div class="panel-body spec-grid">
+                    <article class="spec-cell spec-cell--surge">
+                        <div class="spec-head">
+                            <span class="spec-code">SG</span>
+                            <span class="spec-name">Surge</span>
+                            <span class="spec-tag">rule-set</span>
+                        </div>
+                        <p class="spec-desc">Primary rule-set delivery via stable raw URLs.</p>
+                        <ul class="spec-meta">
+                            <li>EXT .conf .list .module</li>
+                            <li>OUTPUT plaintext</li>
+                        </ul>
+                        <a href="/upload" class="ctrl ctrl-sm spec-action">Upload .list</a>
+                    </article>
+                    <article class="spec-cell spec-cell--mihomo">
+                        <div class="spec-head">
+                            <span class="spec-code">MH</span>
+                            <span class="spec-name">Meta / Mihomo</span>
+                            <span class="spec-tag">profile</span>
+                        </div>
+                        <p class="spec-desc">YAML profiles and subscription-friendly configs for Meta / Mihomo cores.</p>
+                        <ul class="spec-meta">
+                            <li>EXT .yaml .yml</li>
+                            <li>OUTPUT plaintext</li>
+                        </ul>
+                        <a href="/upload" class="ctrl ctrl-sm spec-action">Upload .yaml</a>
+                    </article>
+                    <article class="spec-cell spec-cell--singbox">
+                        <div class="spec-head">
+                            <span class="spec-code">SB</span>
+                            <span class="spec-name">sing-box</span>
+                            <span class="spec-tag">route</span>
+                        </div>
+                        <p class="spec-desc">JSON route sets and outbound definitions for sing-box runtimes.</p>
+                        <ul class="spec-meta">
+                            <li>EXT .json</li>
+                            <li>OUTPUT plaintext</li>
+                        </ul>
+                        <a href="/upload" class="ctrl ctrl-sm spec-action">Upload .json</a>
+                    </article>
+                </div>
+            </section>
+
+            <section class="dash-lower">
+                <div class="panel dash-endpoint">
+                    <div class="panel-hd">
+                        <span class="panel-id">MOD/04</span>
+                        <span class="panel-title">Endpoint Specification</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="spec-line">
+                            <span class="spec-key">BASE</span>
+                            <code>{{.RawBase}}</code>
+                            <button type="button" class="ctrl ctrl-sm copy-btn" data-copy="{{.RawBase}}">Copy</button>
+                        </div>
+                        <div class="spec-line">
+                            <span class="spec-key">PATTERN</span>
+                            <code>{{.RawBase}}/{user}/{filename}</code>
+                            <button type="button" class="ctrl ctrl-sm copy-btn" data-copy="{{.RawBase}}/{user}/{filename}">Copy</button>
+                        </div>
+                        <p class="spec-note">Replace <code>{user}</code> and <code>{filename}</code> with your account and file path.</p>
+                    </div>
+                </div>
+
+                <div class="panel dash-registry">
+                    <div class="panel-hd">
+                        <span class="panel-id">MOD/05</span>
+                        <span class="panel-title">Public Registry</span>
+                        <span class="panel-meta">{{len .Files}} entries</span>
+                    </div>
+                    <div class="panel-body">
+                        {{if .Files}}
+                        <div class="registry-scroll">
+                            <table class="registry-table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Path</th>
+                                        <th>Size</th>
+                                        <th>Updated</th>
+                                        <th>Endpoint</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{range .Files}}
+                                    <tr>
+                                        <td>{{.User}}</td>
+                                        <td><code>{{.Name}}</code></td>
+                                        <td>{{.Size}} B</td>
+                                        <td>{{.Modified}}</td>
+                                        <td>
+                                            <div class="endpoint-row endpoint-row--compact">
+                                                <code class="endpoint-value endpoint-value--sm">{{.RawURL}}</code>
+                                                <button type="button" class="ctrl ctrl-sm copy-btn" data-copy="{{.RawURL}}">Copy</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {{end}}
+                                </tbody>
+                            </table>
+                        </div>
+                        {{else}}
+                        <p class="registry-empty">No public configurations indexed.</p>
+                        {{end}}
+                    </div>
+                </div>
+            </section>
+
+            <footer class="dash-foot">
+                <span>RULES HOST · {{.Domain}}</span>
+                <span>BUILD v2.4.1</span>
+            </footer>
+        </div>
 {{template "footer" .}}
-<script>
-document.querySelectorAll('.copy-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    navigator.clipboard.writeText(btn.dataset.copy).then(() => {
-      btn.textContent = '已复制';
-      setTimeout(() => { btn.textContent = '复制'; }, 1500);
-    });
-  });
-});
-</script>

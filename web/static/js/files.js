@@ -27,26 +27,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           <td class="muted">${f.updated_at.replace('T', ' ').slice(0, 16)}</td>
           <td>
             <div class="url-field">
-              <input class="url-input" readonly value="${App.escapeHTML(f.raw_url)}" onclick="this.select()">
-              <button type="button" class="btn btn-ghost btn-sm copy-btn" data-copy="${App.escapeHTML(f.raw_url)}">复制</button>
+              <input class="url-input" readonly value="${App.escapeHTML(f.raw_url)}" title="Right-click to copy Raw URL" onclick="this.select()">
+              <button type="button" class="btn btn-ghost btn-sm copy-btn" data-copy="${App.escapeHTML(f.raw_url)}">Copy</button>
             </div>
           </td>
           <td class="actions-cell">
-            <a href="/edit/${encodeURI(f.path)}" class="btn btn-ghost btn-sm">编辑</a>
-            <button class="btn btn-ghost btn-sm" data-action="history" data-path="${App.escapeHTML(f.path)}">历史</button>
-            <button class="btn btn-ghost btn-sm" data-action="rename" data-path="${App.escapeHTML(f.path)}">重命名</button>
-            <button class="btn btn-ghost btn-sm btn-danger" data-action="delete" data-path="${App.escapeHTML(f.path)}">删除</button>
+            <a href="/edit/${encodeURI(f.path)}" class="btn btn-ghost btn-sm">Edit</a>
+            <button class="btn btn-ghost btn-sm" data-action="history" data-path="${App.escapeHTML(f.path)}">History</button>
+            <button class="btn btn-ghost btn-sm" data-action="rename" data-path="${App.escapeHTML(f.path)}">Rename</button>
+            <button class="btn btn-ghost btn-sm btn-danger" data-action="delete" data-path="${App.escapeHTML(f.path)}">Delete</button>
           </td>
         </tr>`).join('');
-
-      tbody.querySelectorAll('.copy-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          navigator.clipboard.writeText(btn.dataset.copy).then(() => {
-            btn.textContent = '已复制';
-            setTimeout(() => { btn.textContent = '复制'; }, 1500);
-          });
-        });
-      });
 
       tbody.querySelectorAll('[data-action]').forEach(btn => {
         btn.addEventListener('click', () => handleAction(btn.dataset.action, btn.dataset.path));
@@ -59,10 +50,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function handleAction(action, path) {
     if (action === 'delete') {
-      if (!confirm(`确定删除 ${path}？`)) return;
+      if (!confirm(`Delete ${path}?`)) return;
       try {
         await App.apiJSON('/api/files/' + encodeURI(path), { method: 'DELETE' });
-        App.toast('已删除', 'success');
+        App.toast('Deleted', 'success');
         loadFiles();
       } catch (err) {
         App.toast(err.message, 'error');
@@ -87,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         body: JSON.stringify({ new_path: newPath }),
       });
       document.getElementById('rename-modal').classList.add('hidden');
-      App.toast('重命名成功', 'success');
+      App.toast('Renamed', 'success');
       loadFiles();
     } catch (err) {
       App.toast(err.message, 'error');
@@ -104,26 +95,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function showHistory(path) {
     document.getElementById('history-path').textContent = path;
     const list = document.getElementById('history-list');
-    list.innerHTML = '<p class="muted">加载中…</p>';
+    list.innerHTML = '<p class="muted">Loading…</p>';
     document.getElementById('history-modal').classList.remove('hidden');
 
     try {
       const data = await App.apiJSON('/api/git/log/' + encodeURI(path));
       const commits = data.commits || [];
       if (commits.length === 0) {
-        list.innerHTML = '<p class="empty">暂无版本记录</p>';
+        list.innerHTML = '<p class="empty">No version history</p>';
         return;
       }
       list.innerHTML = commits.map(c => `
         <div class="history-item">
           <div class="history-meta">
-            <code>${c.short_hash}</code>
-            <span>${c.message}</span>
-            <span class="muted">${c.timestamp.replace('T', ' ').slice(0, 16)}</span>
+            <code>${App.escapeHTML(c.short_hash)}</code>
+            <span>${App.escapeHTML(c.message)}</span>
+            <span class="muted">${App.escapeHTML(c.timestamp.replace('T', ' ').slice(0, 16))}</span>
           </div>
           <div class="history-actions">
-            <button class="btn btn-ghost btn-sm" data-commit="${c.hash}" data-path="${App.escapeHTML(path)}" data-action="view">查看</button>
-            <button class="btn btn-ghost btn-sm" data-commit="${c.hash}" data-path="${App.escapeHTML(path)}" data-action="restore">回滚</button>
+            <button class="btn btn-ghost btn-sm" data-commit="${App.escapeHTML(c.hash)}" data-path="${App.escapeHTML(path)}" data-action="view">View</button>
+            <button class="btn btn-ghost btn-sm" data-commit="${App.escapeHTML(c.hash)}" data-path="${App.escapeHTML(path)}" data-action="restore">Restore</button>
           </div>
         </div>`).join('');
 
@@ -135,14 +126,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const text = await res.text();
             alert(text.slice(0, 2000) + (text.length > 2000 ? '\n…' : ''));
           } else if (action === 'restore') {
-            if (!confirm(`回滚 ${p} 到 ${commit.slice(0, 7)}？`)) return;
+            if (!confirm(`Restore ${p} to ${commit.slice(0, 7)}?`)) return;
             try {
               await App.apiJSON('/api/git/restore/' + encodeURI(p), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ commit }),
               });
-              App.toast('回滚成功', 'success');
+              App.toast('Restored', 'success');
               document.getElementById('history-modal').classList.add('hidden');
               loadFiles();
             } catch (err) {
