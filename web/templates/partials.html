@@ -30,9 +30,7 @@
             </a>
             <nav class="site-nav" aria-label="Main navigation">
                 <a href="/" class="nav-link{{if eq .ActiveNav "home"}} is-active{{end}}">[ Home ]</a>
-                {{if ne .ActiveNav "home"}}
                 <a href="/upload" class="nav-link{{if eq .ActiveNav "upload"}} is-active{{end}}">[ Upload ]</a>
-                {{end}}
                 <a href="/files" class="nav-link{{if eq .ActiveNav "files"}} is-active{{end}}">[ Manage ]</a>
             </nav>
             <div class="header-tools">
@@ -49,9 +47,7 @@
         </div>
         <div class="mobile-nav" id="mobile-nav">
             <a href="/" class="nav-link{{if eq .ActiveNav "home"}} is-active{{end}}">[ Home ]</a>
-            {{if ne .ActiveNav "home"}}
             <a href="/upload" class="nav-link{{if eq .ActiveNav "upload"}} is-active{{end}}">[ Upload ]</a>
-            {{end}}
             <a href="/files" class="nav-link{{if eq .ActiveNav "files"}} is-active{{end}}">[ Manage ]</a>
         </div>
     </header>

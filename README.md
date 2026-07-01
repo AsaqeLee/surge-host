@@ -2,6 +2,8 @@
 
 A lightweight, self-hosted service for hosting, versioning, and validating proxy configuration files. Deliver Surge, Meta/Mihomo, and sing-box configs through stable Raw URLs.
 
+> **Project status (2026-07-01):** Development is **complete**. v2.4.1 is the final feature release. The production deployment runs at [rules.asaqe.site](https://rules.asaqe.site). See [CHANGELOG.md](CHANGELOG.md) for the full release history.
+
 📖 [中文文档](README.zh-CN.md)
 
 ```
@@ -56,8 +58,8 @@ Validation is **format-level / heuristic**, not a full upstream schema parser.
 | **Backend** | Go 1.22+ |
 | **Database** | SQLite (embedded) |
 | **VCS** | Native Git |
-| **Frontend** | Go templates + vanilla JS |
-| **Deployment** | Docker & Docker Compose |
+| **Frontend** | Go templates + vanilla JS (`system.css`) |
+| **Deployment** | Docker & Docker Compose (1Panel-ready) |
 
 ---
 
@@ -72,6 +74,8 @@ cp .env.example .env
 # Edit .env: domain, admin password, JWT secret
 docker compose up -d --build
 ```
+
+> After changing `web/` templates or static assets, run `docker compose build` before `up -d --force-recreate`. A container-only restart does not refresh baked-in frontend files.
 
 ### Local development
 
@@ -134,6 +138,19 @@ RULE-SET,https://your-domain.com/raw/user/rules.list,PROXY
 | `GET /api/git/log/{path}` | Version history |
 
 Authenticated endpoints require `Authorization: Bearer <token>` from `POST /api/auth/login`.
+
+---
+
+## Web UI
+
+| Path | Purpose |
+|------|---------|
+| `/` | Product overview, system readout, public registry |
+| `/upload` | Drag-and-drop upload |
+| `/files` | Manage files, copy Raw URLs, history, rename, delete |
+| `/edit/{path}` | Online editor with syntax highlighting and validation |
+
+The interface uses a monochrome, grid-based console style (Instrument Serif + JetBrains Mono). Copy Raw URLs via the **Copy** button, by clicking the URL text, or right-click on URL fields.
 
 ---
 

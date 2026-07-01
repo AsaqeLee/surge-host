@@ -2,6 +2,8 @@
 
 **自托管多平台代理配置托管服务 — 上传、版本管理、语法校验，通过 Raw URL 统一分发 Surge、Meta/Mihomo、sing-box 等配置文件。**
 
+> **项目状态（2026-07-01）：** 开发已**正式结束**。v2.4.1 为最终功能版本，生产环境运行于 [rules.asaqe.site](https://rules.asaqe.site)。更新记录见 [CHANGELOG.md](CHANGELOG.md)。
+
 📖 [English README](README.md)
 
 ```
@@ -100,6 +102,8 @@ curl http://127.0.0.1:28080/healthz
 # → {"status":"ok"}
 ```
 
+> 修改 `web/` 模板或静态资源后，需执行 `docker compose build` 再 `up -d --force-recreate`；仅重启容器不会更新镜像内前端文件。
+
 > **1Panel 用户：** `docker-compose.yml` 默认接入 `1panel-network`，非 1Panel 环境请修改或删除 `networks` 配置。
 
 ### 第三步：暴露 HTTPS
@@ -151,10 +155,14 @@ https://rules.example.com/raw/admin/sing-box.json
 
 | 路径 | 说明 |
 |------|------|
-| `/` | 公开配置列表与快速入门 |
+| `/` | 产品概览、系统状态、平台说明、公开注册表 |
 | `/upload` | 拖拽上传 |
-| `/files` | 文件管理（重命名、删除、历史） |
+| `/files` | 文件管理（重命名、删除、历史、复制 Raw URL） |
 | `/edit/{path}` | 在线编辑、语法高亮、校验 |
+
+顶栏导航：`[ Home ]` `[ Upload ]` `[ Manage ]`。界面为黑白网格化控制台风格（`system.css`）。
+
+复制 Raw URL：点击 **Copy** 按钮、点击 URL 文本，或在 URL 输入框上右键。
 
 启用认证后使用管理员账号登录，Token 保存在浏览器 `localStorage`。
 
@@ -311,12 +319,29 @@ surge-host/
 ├── cmd/server/           # 入口
 ├── internal/             # 核心业务逻辑
 ├── pkg/validator/        # 多格式配置校验
-├── web/                  # 前端模板与静态资源
+├── web/
+│   ├── templates/        # Go HTML 模板
+│   └── static/css/       # system.css 统一设计系统
 ├── data/                 # 运行时数据（不提交）
-├── Dockerfile
+├── CHANGELOG.md          # 版本与结项记录
+├── Dockerfile.release    # 1Panel 发布镜像（预编译二进制）
 ├── docker-compose.yml
 └── .env.example
 ```
+
+---
+
+## 结项说明
+
+本项目目标已全部达成：
+
+- 多平台配置托管（Surge / Meta/Mihomo / sing-box）
+- 稳定 Raw URL 纯文本分发
+- Web 上传、编辑、校验、Git 版本管理
+- Docker / 1Panel 一键部署
+- 生产环境 [rules.asaqe.site](https://rules.asaqe.site) 已上线
+
+后续仅接受关键安全修复，不再规划新功能。感谢使用。
 
 ---
 
