@@ -43,7 +43,7 @@ func pageData(cfg *config.Config, r *http.Request, authSvc *auth.Service, extra 
 }
 
 func rawBaseURL(cfg *config.Config, r *http.Request) string {
-	if cfg.Domain != "localhost" && !strings.HasPrefix(cfg.Domain, "127.0.0.1") {
+	if !cfg.IsLoopbackDomain() {
 		return "https://" + cfg.Domain + "/raw"
 	}
 	scheme := "http"

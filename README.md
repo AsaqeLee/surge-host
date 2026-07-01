@@ -86,6 +86,11 @@ go run ./cmd/server
 
 Default: `http://localhost:8080`
 
+When `SURGE_HOST_DOMAIN` is not loopback (`localhost`, `127.0.0.1`, `::1`), startup now requires:
+
+- a non-empty `SURGE_HOST_ADMIN_PASSWORD`
+- a non-default `SURGE_HOST_JWT_SECRET`
+
 ---
 
 ## Configuration
@@ -96,9 +101,9 @@ Key environment variables:
 |----------|-------------|
 | `SURGE_HOST_DOMAIN` | Public domain for Raw URL generation |
 | `SURGE_HOST_ADMIN_USER` | Dashboard admin username |
-| `SURGE_HOST_ADMIN_PASSWORD` | Admin password (enables auth) |
-| `SURGE_HOST_JWT_SECRET` | JWT signing secret |
-| `SURGE_HOST_ALLOWED_EXTENSIONS` | Allowed file types (default includes `.json`) |
+| `SURGE_HOST_ADMIN_PASSWORD` | Admin password; required for non-loopback deployments |
+| `SURGE_HOST_JWT_SECRET` | JWT signing secret; must not use the default fallback on non-loopback deployments |
+| `SURGE_HOST_ALLOWED_EXTENSIONS` | Allowed file types (default: `.conf,.list,.txt,.module,.yaml,.yml,.json`) |
 | `SURGE_HOST_VALIDATE_ENABLED` | Toggle syntax validation |
 | `SURGE_HOST_GIT_ENABLED` | Toggle Git versioning |
 
@@ -131,6 +136,7 @@ RULE-SET,https://your-domain.com/raw/user/rules.list,PROXY
 
 | Endpoint | Description |
 |----------|-------------|
+| `GET /healthz` | Dependency health check (DB + storage dirs) |
 | `GET /api/files` | List files |
 | `POST /api/files` | Upload (multipart) |
 | `PUT /api/files/{path}` | Replace content |

@@ -43,11 +43,10 @@ func New(cfg *config.Config) (*Server, error) {
 
 	authSvc := auth.NewService(cfg.JWTSecret, cfg.AdminUser, cfg.AdminPassword)
 	if !authSvc.AuthEnabled() {
-		slog.Warn("authentication disabled — set SURGE_HOST_ADMIN_PASSWORD to enable")
-	} else {
-		warnInsecureAuth(cfg)
+		slog.Warn("authentication disabled for loopback development — set SURGE_HOST_ADMIN_PASSWORD to enable auth")
 	}
-	if cfg.JWTSecret == "change-me-in-production" {
+	warnInsecureAuth(cfg)
+	if cfg.UsesDefaultJWTSecret() {
 		slog.Warn("using default JWT secret — set SURGE_HOST_JWT_SECRET to a random value")
 	}
 
@@ -64,7 +63,7 @@ func New(cfg *config.Config) (*Server, error) {
 	}
 
 	raw := handler.NewRawHandler(cfg)
-	health := &handler.HealthHandler{}
+	health := handler.NewHealthHandler(cfg, database)
 	authHandler := handler.NewAuthHandler(authSvc)
 	fileAPI := handler.NewFileAPIHandler(cfg, fileStore)
 	requireAuth := auth.RequireAuth(authSvc)
@@ -176,4 +175,3 @@ func ensureDirs(cfg *config.Config) error {
 	}
 	return nil
 }
-

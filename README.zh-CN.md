@@ -177,6 +177,15 @@ GET /raw/{user}/{path...}
 - 支持子目录路径
 - 防路径穿越、扩展名白名单
 
+### 健康检查
+
+`/healthz` 会检查以下依赖状态：
+
+- SQLite 连接可用
+- `data/` 目录可写
+- `data/users/` 目录存在
+- 开启 Git 时 `data/repos/` 目录存在
+
 ### 版本管理
 
 每个用户拥有独立 Git 裸仓库，上传、编辑、重命名、删除均自动提交。
@@ -267,6 +276,11 @@ export SURGE_HOST_JWT_SECRET=dev-secret
 go run ./cmd/server
 ```
 
+当 `SURGE_HOST_DOMAIN` 不是回环地址（`localhost`、`127.0.0.1`、`::1`）时，服务启动将强制要求：
+
+- 必须设置非空 `SURGE_HOST_ADMIN_PASSWORD`
+- 必须将 `SURGE_HOST_JWT_SECRET` 改为非默认值
+
 ### 环境变量
 
 | 变量 | 默认值 | 说明 |
@@ -275,8 +289,8 @@ go run ./cmd/server
 | `SURGE_HOST_DATA_DIR` | `./data` | 数据根目录 |
 | `SURGE_HOST_DOMAIN` | `localhost` | 公网域名（生成 Raw URL） |
 | `SURGE_HOST_ADMIN_USER` | `admin` | 管理员用户名 |
-| `SURGE_HOST_ADMIN_PASSWORD` | _(空)_ | 密码；为空则开发模式 |
-| `SURGE_HOST_JWT_SECRET` | `change-me-in-production` | JWT 密钥 |
+| `SURGE_HOST_ADMIN_PASSWORD` | _(空)_ | 密码；仅回环开发环境可为空 |
+| `SURGE_HOST_JWT_SECRET` | `change-me-in-production` | JWT 密钥；非回环部署必须改掉 |
 | `SURGE_HOST_MAX_FILE_SIZE` | `5242880` | 单文件上限（5 MB） |
 | `SURGE_HOST_ALLOWED_EXTENSIONS` | `.conf,.list,.txt,.module,.yaml,.yml,.json` | 允许扩展名 |
 | `SURGE_HOST_GIT_ENABLED` | `true` | Git 版本控制 |
