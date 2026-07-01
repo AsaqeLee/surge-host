@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <td>
             <div class="url-field">
               <input class="url-input" readonly value="${App.escapeHTML(f.raw_url)}" title="Right-click to copy Raw URL" onclick="this.select()">
-              <button type="button" class="btn btn-ghost btn-sm copy-btn" data-copy="${App.escapeHTML(f.raw_url)}">Copy</button>
+              <button type="button" class="btn btn-ghost btn-sm copy-btn" data-copy="${App.attrEscape(f.raw_url)}">Copy</button>
             </div>
           </td>
           <td class="actions-cell">
@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       tbody.querySelectorAll('[data-action]').forEach(btn => {
         btn.addEventListener('click', () => handleAction(btn.dataset.action, btn.dataset.path));
       });
+      App.bindCopyButtons(tbody);
     } catch (err) {
       loading.classList.add('hidden');
       App.toast(err.message, 'error');

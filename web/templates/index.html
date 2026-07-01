@@ -35,7 +35,7 @@
                         </table>
                         <div class="endpoint-block">
                             <span class="endpoint-label">Sample Endpoint</span>
-                            <div class="endpoint-row">
+                            <div class="endpoint-row" data-copy-url="{{.RawBase}}/{{.AdminUser}}/rules.list">
                                 <code class="endpoint-value">{{.RawBase}}/{{.AdminUser}}/rules.list</code>
                                 <button type="button" class="ctrl ctrl-sm copy-btn" data-copy="{{.RawBase}}/{{.AdminUser}}/rules.list">Copy</button>
                             </div>
@@ -101,12 +101,12 @@
                     <div class="panel-body">
                         <div class="spec-line">
                             <span class="spec-key">BASE</span>
-                            <code>{{.RawBase}}</code>
+                            <code class="copyable-url">{{.RawBase}}</code>
                             <button type="button" class="ctrl ctrl-sm copy-btn" data-copy="{{.RawBase}}">Copy</button>
                         </div>
                         <div class="spec-line">
                             <span class="spec-key">PATTERN</span>
-                            <code>{{.RawBase}}/{user}/{filename}</code>
+                            <code class="copyable-url">{{.RawBase}}/{user}/{filename}</code>
                             <button type="button" class="ctrl ctrl-sm copy-btn" data-copy="{{.RawBase}}/{user}/{filename}">Copy</button>
                         </div>
                         <p class="spec-note">Replace <code>{user}</code> and <code>{filename}</code> with your account and file path.</p>
@@ -140,7 +140,7 @@
                                         <td>{{.Size}} B</td>
                                         <td>{{.Modified}}</td>
                                         <td>
-                                            <div class="endpoint-row endpoint-row--compact">
+                                            <div class="endpoint-row endpoint-row--compact" data-copy-url="{{.RawURL}}">
                                                 <code class="endpoint-value endpoint-value--sm">{{.RawURL}}</code>
                                                 <button type="button" class="ctrl ctrl-sm copy-btn" data-copy="{{.RawURL}}">Copy</button>
                                             </div>

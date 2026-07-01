@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       editor.value = meta.content;
       original = meta.content;
       rawUrlInput.value = meta.file.raw_url;
+      document.getElementById('editor-copy-url')?.setAttribute('data-copy', meta.file.raw_url);
       syncHighlight();
       status.textContent = 'Loaded';
     } catch (err) {

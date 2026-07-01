@@ -132,41 +132,151 @@ const App = (() => {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  function copyText(text) {
-    return navigator.clipboard.writeText(text);
+  function attrEscape(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  async function copyText(text) {
+    const value = String(text || '').trim();
+    if (!value) throw new Error('Nothing to copy');
+
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(value);
+        return;
+      } catch (_) {
+        /* fall through to legacy copy */
+      }
+    }
+
+    const ta = document.createElement('textarea');
+    ta.value = value;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    ta.style.left = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, value.length);
+    try {
+      const ok = document.execCommand('copy');
+      if (!ok) throw new Error('Copy failed');
+    } finally {
+      document.body.removeChild(ta);
+    }
   }
 
   function urlInputFromTarget(target) {
+    const field = target.closest('.url-field, .endpoint-row, .endpoint-block, .spec-line');
+    if (field) {
+      const input = field.querySelector('.url-input');
+      if (input?.value) return input;
+      const code = field.querySelector('.endpoint-value, code');
+      if (code?.textContent) return { value: code.textContent.trim() };
+    }
     const input = target.closest('.url-input');
     if (input?.value) return input;
-    const field = target.closest('.url-field');
-    return field?.querySelector('.url-input') || null;
+    const code = target.closest('.endpoint-value');
+    if (code?.textContent) return { value: code.textContent.trim() };
+    return null;
+  }
+
+  function copyableText(el) {
+    if (!el) return '';
+    return (el.getAttribute('data-copy')
+      || el.dataset?.copy
+      || el.textContent
+      || '').trim();
+  }
+
+  function markCopied(el) {
+    if (!el) return;
+    const orig = el.textContent;
+    el.textContent = 'Copied';
+    setTimeout(() => { el.textContent = orig; }, 1500);
+  }
+
+  function copyValue(text, feedbackEl) {
+    const value = String(text || '').trim();
+    if (!value) {
+      toast('Nothing to copy', 'error');
+      return Promise.resolve(false);
+    }
+    return copyText(value)
+      .then(() => {
+        toast('Copied', 'success');
+        markCopied(feedbackEl);
+        return true;
+      })
+      .catch(() => {
+        toast('Copy failed', 'error');
+        return false;
+      });
+  }
+
+  function copyButton(btn) {
+    if (!btn) return Promise.resolve(false);
+    return copyValue(copyableText(btn), btn);
+  }
+
+  function bindCopyButtons(root = document) {
+    root.querySelectorAll('.copy-btn').forEach((btn) => {
+      if (btn.dataset.copyBound === '1') return;
+      btn.dataset.copyBound = '1';
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        copyButton(btn);
+      });
+    });
   }
 
   function bindUrlCopy() {
+    bindCopyButtons();
+
     document.addEventListener('contextmenu', (e) => {
       const input = urlInputFromTarget(e.target);
       if (!input?.value) return;
       e.preventDefault();
-      copyText(input.value)
-        .then(() => toast('Raw URL copied', 'success'))
-        .catch(() => toast('Copy failed', 'error'));
+      copyValue(input.value);
     });
 
     document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.copy-btn');
-      if (!btn) return;
-      const text = btn.dataset.copy || urlInputFromTarget(btn)?.value;
-      if (!text) return;
-      e.preventDefault();
-      copyText(text)
-        .then(() => {
-          const orig = btn.textContent;
-          btn.textContent = 'Copied';
-          setTimeout(() => { btn.textContent = orig; }, 1500);
-        })
-        .catch(() => toast('Copy failed', 'error'));
+      if (e.target.closest('.copy-btn')) return;
+
+      const row = e.target.closest('[data-copy-url]');
+      if (row) {
+        e.preventDefault();
+        copyValue(row.getAttribute('data-copy-url'));
+        return;
+      }
+
+      const endpoint = e.target.closest('.endpoint-value, .copyable-url');
+      if (endpoint?.textContent) {
+        e.preventDefault();
+        copyValue(endpoint.textContent.trim());
+        return;
+      }
+
+      const input = e.target.closest('.url-input');
+      if (input?.value) {
+        e.preventDefault();
+        copyValue(input.value);
+      }
     });
+  }
+
+  function init() {
+    updateThemeUI();
+    updateAuthUI();
+    bindLoginForm();
+    bindUrlCopy();
+    bindMobileNav();
+    document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
   }
 
   function detectEditorMode(path = '') {
@@ -256,14 +366,11 @@ const App = (() => {
     });
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    updateThemeUI();
-    updateAuthUI();
-    bindLoginForm();
-    bindUrlCopy();
-    bindMobileNav();
-    document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
-  });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 
   function showValidationIssues(container, validation) {
     if (!container || !validation) return;
@@ -292,8 +399,8 @@ const App = (() => {
   }
 
   return {
-    authEnabled, getToken, api, apiJSON, toast, formatSize,
-    detectEditorMode, highlightConfig, escapeHTML, requireAuth, showLogin,
-    showValidationIssues, validateContent,
+    authEnabled, getToken, api, apiJSON, toast, formatSize, copyText, copyButton,
+    bindCopyButtons, detectEditorMode, highlightConfig, escapeHTML, attrEscape,
+    requireAuth, showLogin, showValidationIssues, validateContent,
   };
 })();

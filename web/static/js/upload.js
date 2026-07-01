@@ -77,12 +77,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p class="result-success">Upload complete</p>
         <div class="url-field">
           <input class="url-input" readonly value="${App.escapeHTML(data.raw_url)}" title="Right-click to copy Raw URL" onclick="this.select()">
-          <button type="button" class="btn btn-ghost btn-sm copy-btn" id="result-copy">Copy</button>
+          <button type="button" class="btn btn-ghost btn-sm copy-btn" id="result-copy" data-copy="${App.attrEscape(data.raw_url)}">Copy</button>
         </div>
         <div class="result-actions">
           <a href="/edit/${encodeURI(data.path)}" class="btn btn-secondary btn-sm">Edit</a>
           <a href="/files" class="btn btn-primary btn-sm">Manage</a>
         </div>`;
+      App.bindCopyButtons(resultBox);
       App.toast('Upload complete', 'success');
     } catch (err) {
       App.toast(err.message, 'error');

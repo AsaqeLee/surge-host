@@ -545,6 +545,7 @@ code, pre, kbd, samp, .font-mono {
     background: var(--surface);
     border: none;
     border-right: var(--lane);
+    cursor: copy;
 }
 
 .endpoint-value--sm { font-size: 10px; }
@@ -552,6 +553,19 @@ code, pre, kbd, samp, .font-mono {
 .endpoint-row .ctrl {
     border-right: none;
     flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.copyable-url {
+    cursor: copy;
+    flex: 1;
+    min-width: 0;
+    word-break: break-all;
+}
+
+.spec-line .copyable-url {
+    font-size: 11px;
 }
 
 /* ── Platforms ── */
