@@ -18,6 +18,7 @@
     --tag-gold: #b8953c;
     --tag-purple: #7c6b9e;
     --tag-green: #5a8f6e;
+    --tag-loon: #4a7c9b;
     --grid-line: #0a0a0a0a;
     --modal-overlay: #00000073;
 }
@@ -619,6 +620,8 @@ code, pre, kbd, samp, .font-mono {
 .spec-cell--surge .spec-tag { color: var(--tag-teal); }
 .spec-cell--mihomo .spec-tag { color: var(--tag-gold); }
 .spec-cell--singbox .spec-tag { color: var(--tag-purple); }
+.spec-cell--loon .spec-code { color: var(--tag-loon); border-color: var(--tag-loon); }
+.spec-cell--loon .spec-tag { color: var(--tag-loon); }
 
 .spec-name {
     font-size: 11px;
@@ -1347,14 +1350,15 @@ code, pre, kbd, samp, .font-mono {
         border-right: var(--lane);
     }
 
-    .spec-grid { grid-template-columns: repeat(3, 1fr); }
+    .spec-grid { grid-template-columns: repeat(2, 1fr); }
 
     .spec-cell {
-        border-bottom: none;
+        border-bottom: var(--lane);
         border-right: var(--lane);
     }
 
-    .spec-cell:last-child { border-right: none; }
+    .spec-cell:nth-child(2n) { border-right: none; }
+    .spec-cell:nth-last-child(-n+2) { border-bottom: none; }
 
     .dash-lower {
         grid-template-columns: 0.95fr 1.05fr;

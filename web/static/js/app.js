@@ -283,13 +283,15 @@ const App = (() => {
     const lower = String(path).toLowerCase();
     if (lower.endsWith('.json')) return 'json';
     if (lower.endsWith('.yaml') || lower.endsWith('.yml')) return 'yaml';
-    if (lower.endsWith('.list') || lower.endsWith('.conf') || lower.endsWith('.module')) return 'surge';
+    if (lower.endsWith('.list') || lower.endsWith('.conf') || lower.endsWith('.module')
+        || lower.endsWith('.plugin') || lower.endsWith('.lpx')) return 'surge';
     return 'text';
   }
 
   function highlightSurge(code) {
     let s = escapeHTML(code);
-    // comments
+    // comments (# and Loon #! headers)
+    s = s.replace(/^(#!.*)$/gm, '<span class="hl-comment">$1</span>');
     s = s.replace(/(#.*)$/gm, '<span class="hl-comment">$1</span>');
     // section headers
     s = s.replace(/(\[[\w-]+\])/g, '<span class="hl-section">$1</span>');

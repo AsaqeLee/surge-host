@@ -91,6 +91,23 @@ func TestValidateSingBoxJSONInvalidSyntax(t *testing.T) {
 	}
 }
 
+func TestValidateLoonPluginValid(t *testing.T) {
+	content := []byte(`#!name = Test Plugin
+#!desc = Example Loon plugin
+[General]
+skip-proxy = example.com
+[Rule]
+DOMAIN,example.com,REJECT
+`)
+	result := Validate("skip-proxy.lpx", content, false)
+	if !result.Valid {
+		t.Fatalf("expected valid Loon plugin, got issues: %+v", result.Issues)
+	}
+	if result.FileType != "loon-plugin" {
+		t.Fatalf("expected file type loon-plugin, got %s", result.FileType)
+	}
+}
+
 func TestValidateSkipsPlainText(t *testing.T) {
 	result := Validate("readme.txt", []byte("anything"), true)
 	if !result.Valid {

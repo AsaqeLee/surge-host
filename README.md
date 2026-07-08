@@ -1,6 +1,6 @@
 # surge-host
 
-A lightweight, self-hosted service for hosting, versioning, and validating proxy configuration files. Deliver Surge, Meta/Mihomo, and sing-box configs through stable Raw URLs.
+A lightweight, self-hosted service for hosting, versioning, and validating proxy configuration files. Deliver Surge, Loon, Meta/Mihomo, and sing-box configs through stable Raw URLs.
 
 > **Project status (2026-07-01):** Development is **complete**. v2.4.1 is the final feature release. The production deployment runs at [rules.asaqe.site](https://rules.asaqe.site). See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 
@@ -28,8 +28,9 @@ Proxy rules and client configs need a **stable, plain-text HTTP endpoint** — n
 
 | Extension | Client / use case | Validation |
 |-----------|-------------------|------------|
-| `.list` | Surge rule sets | Rule-line syntax |
+| `.list` | Surge / Loon rule sets | Rule-line syntax |
 | `.conf`, `.module` | Surge configuration | Section and rule checks |
+| `.plugin`, `.lpx` | Loon plugins | Plugin sections (`[General]`, `[Rule]`, `[Script]`, …) |
 | `.yaml`, `.yml` | Meta / Mihomo | YAML syntax + structure |
 | `.json` | sing-box | JSON syntax + top-level structure |
 | `.txt` | Plain text | No validation |
@@ -103,7 +104,7 @@ Key environment variables:
 | `SURGE_HOST_ADMIN_USER` | Dashboard admin username |
 | `SURGE_HOST_ADMIN_PASSWORD` | Admin password; required for non-loopback deployments |
 | `SURGE_HOST_JWT_SECRET` | JWT signing secret; must not use the default fallback on non-loopback deployments |
-| `SURGE_HOST_ALLOWED_EXTENSIONS` | Allowed file types (default: `.conf,.list,.txt,.module,.yaml,.yml,.json`) |
+| `SURGE_HOST_ALLOWED_EXTENSIONS` | Allowed file types (default includes `.plugin`, `.lpx`) |
 | `SURGE_HOST_VALIDATE_ENABLED` | Toggle syntax validation |
 | `SURGE_HOST_GIT_ENABLED` | Toggle Git versioning |
 
@@ -131,6 +132,18 @@ RULE-SET,https://your-domain.com/raw/user/rules.list,PROXY
 **Meta / Mihomo** — use the Raw URL in `rule-providers` or subscription fields.
 
 **sing-box** — point your client or sync script at the Raw JSON URL.
+
+**Loon (iOS / tvOS / macOS)**
+
+- **Rules** — host `.list` rule sets and subscribe via Raw URL (same rule-line format as Surge).
+- **Plugins** — host `.plugin` or `.lpx` files and import by URL in Loon → Configuration → Plugin → Add.
+
+```text
+https://your-domain.com/raw/user/rules.list
+https://your-domain.com/raw/user/skip-proxy.lpx
+```
+
+In Loon, add a rule provider or plugin subscription pointing at the Raw URL. Updates on surge-host are picked up on the next sync.
 
 ### REST API
 

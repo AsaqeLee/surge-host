@@ -1,6 +1,6 @@
 # surge-host
 
-**自托管多平台代理配置托管服务 — 上传、版本管理、语法校验，通过 Raw URL 统一分发 Surge、Meta/Mihomo、sing-box 等配置文件。**
+**自托管多平台代理配置托管服务 — 上传、版本管理、语法校验，通过 Raw URL 统一分发 Surge、Loon、Meta/Mihomo、sing-box 等配置文件。**
 
 > **项目状态（2026-07-01）：** 开发已**正式结束**。v2.4.1 为最终功能版本，生产环境运行于 [rules.asaqe.site](https://rules.asaqe.site)。更新记录见 [CHANGELOG.md](CHANGELOG.md)。
 
@@ -145,7 +145,21 @@ https://rules.example.com/raw/admin/meta.yaml
 https://rules.example.com/raw/admin/sing-box.json
 ```
 
-保存后即可通过同一条 Raw URL 拉取新内容，适合 Surge、Meta/Mihomo、sing-box 或同步脚本统一消费。
+保存后即可通过同一条 Raw URL 拉取新内容，适合 Surge、Loon、Meta/Mihomo、sing-box 或同步脚本统一消费。
+
+### Loon（iOS / tvOS / macOS）
+
+| 类型 | 扩展名 | 用法 |
+|------|--------|------|
+| 规则集 | `.list` | 与 Surge 规则行格式相同，在 Loon 中以规则集 / 订阅 URL 引用 Raw 地址 |
+| 插件 | `.plugin`、`.lpx` | 在 Loon → 配置 → 插件 → 添加，填入插件 Raw URL |
+
+```text
+https://rules.example.com/raw/admin/rules.list
+https://rules.example.com/raw/admin/skip-proxy.lpx
+```
+
+上传或编辑后，Loon 下次同步即可拉取最新内容。若 `.env` 中显式设置了 `SURGE_HOST_ALLOWED_EXTENSIONS`，请加入 `.plugin` 与 `.lpx`。
 
 ---
 
@@ -215,6 +229,7 @@ curl -X POST -H "Authorization: Bearer $TOKEN" \
 当前内置以下格式校验：
 
 - Surge：`.list`、`.conf`、`.module`
+- Loon：`.list`、`.plugin`、`.lpx`
 - Meta / Mihomo：`.yaml`、`.yml`
 - sing-box：`.json`
 
@@ -292,7 +307,7 @@ go run ./cmd/server
 | `SURGE_HOST_ADMIN_PASSWORD` | _(空)_ | 密码；仅回环开发环境可为空 |
 | `SURGE_HOST_JWT_SECRET` | `change-me-in-production` | JWT 密钥；非回环部署必须改掉 |
 | `SURGE_HOST_MAX_FILE_SIZE` | `5242880` | 单文件上限（5 MB） |
-| `SURGE_HOST_ALLOWED_EXTENSIONS` | `.conf,.list,.txt,.module,.yaml,.yml,.json` | 允许扩展名 |
+| `SURGE_HOST_ALLOWED_EXTENSIONS` | `.conf,.list,.txt,.module,.plugin,.lpx,.yaml,.yml,.json` | 允许扩展名 |
 | `SURGE_HOST_GIT_ENABLED` | `true` | Git 版本控制 |
 | `SURGE_HOST_VALIDATE_ENABLED` | `true` | 语法校验 |
 | `SURGE_HOST_VALIDATE_STRICT` | `false` | 严格校验 |

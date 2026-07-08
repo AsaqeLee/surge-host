@@ -70,6 +70,9 @@ var (
 		"MAP-LOCAL":      true,
 		"SCRIPT":         true,
 		"MITM":           true,
+		// Loon plugin sections
+		"REWRITE":  true,
+		"ARGUMENT": true,
 	}
 
 	mihomoTopLevelKeys = map[string]bool{
@@ -123,8 +126,12 @@ func Validate(filename string, content []byte, strict bool) Result {
 	switch strings.ToLower(filepath.Ext(filename)) {
 	case ".list":
 		return validateList(content, strict)
-	case ".conf", ".module":
-		return validateConf(content, strict)
+	case ".conf", ".module", ".plugin", ".lpx":
+		res := validateConf(content, strict)
+		if ext := strings.ToLower(filepath.Ext(filename)); ext == ".plugin" || ext == ".lpx" {
+			res.FileType = "loon-plugin"
+		}
+		return res
 	case ".yaml", ".yml":
 		return validateYAMLConfig(content, strict)
 	case ".json":
