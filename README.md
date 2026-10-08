@@ -134,4 +134,8 @@ Dockerfile
 
 ## Status / limitations
 
-Final feature release declared in CHANGELOG; treat further work as maintenance. No LICENSE file is currently present in the repository root despite earlier documentation mentions—confirm licensing before redistribution.
+Final feature release declared in CHANGELOG; treat further work as maintenance.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
