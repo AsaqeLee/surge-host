@@ -1,13 +1,42 @@
 # surge-host
 
+[English](README.md) | 简体中文
+
+[![CI](https://github.com/AsaqeLee/surge-host/actions/workflows/ci.yml/badge.svg)](https://github.com/AsaqeLee/surge-host/actions/workflows/ci.yml)
+[![Go version](https://img.shields.io/github/go-mod/go-version/AsaqeLee/surge-host)](go.mod)
+[![License: MIT](https://img.shields.io/github/license/AsaqeLee/surge-host)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/AsaqeLee/surge-host)](https://github.com/AsaqeLee/surge-host/commits/main)
+
 **自托管多平台代理配置托管服务 — 上传、版本管理、语法校验，通过 Raw URL 统一分发 Surge、Loon、Meta/Mihomo、sing-box 等配置文件。**
 
 > **项目状态（2026-07-01）：** 开发已**正式结束**。v2.4.1 为最终功能版本，生产环境运行于 [rules.asaqe.site](https://rules.asaqe.site)。更新记录见 [CHANGELOG.md](CHANGELOG.md)。
 
-📖 [English README](README.md)
 
 ```
 https://your-domain.com/raw/{user}/{filename}
+```
+
+---
+
+## 架构
+
+```mermaid
+flowchart LR
+    C[代理客户端<br/>Surge / Loon / Mihomo / sing-box] -->|GET /raw/user/path| MW
+    B[浏览器 Web 管理] -->|pages + /api/*| MW
+    MW[Middleware<br/>Recovery → Logging → CORS] --> MUX[net/http ServeMux]
+    MUX --> RAW[Raw handler]
+    MUX --> PAGES[Home / page handlers<br/>html/template]
+    MUX --> AUTHH[POST /api/auth/login]
+    MUX --> RA{{RequireAuth<br/>JWT Bearer}}
+    RA --> API[File API<br/>files · validate · git log/show/restore]
+    API --> VAL[pkg/validator]
+    API --> FS[internal/store FileStore]
+    FS --> DISK[(Data dir<br/>磁盘文件)]
+    FS --> DB[(SQLite<br/>modernc.org/sqlite)]
+    FS --> VCS[internal/vcs<br/>git CLI]
+    RAW --> DISK
+    MUX --> HZ[GET /healthz] --> DB
 ```
 
 ---
@@ -56,7 +85,7 @@ https://your-domain.com/raw/{user}/{filename}
 ### 前置要求
 
 - Docker 20.10+ 与 Docker Compose v2+（推荐）
-- 或 Go 1.22+ 用于本地开发
+- 或 Go 1.26+ 用于本地开发（见 `go.mod`）
 - 生产环境需 HTTPS 反代或隧道（Nginx、Caddy、Cloudflare Tunnel 等）
 
 ### 第一步：配置环境变量
@@ -373,6 +402,15 @@ surge-host/
 后续仅接受关键安全修复，不再规划新功能。感谢使用。
 
 ---
+
+## 测试
+
+```bash
+go vet ./...
+go test -race ./...
+```
+
+CI（`.github/workflows/ci.yml`）在每次推送 `main` 时运行 vet、race 测试、构建、固定版本的 `govulncheck` 以及 Docker 构建。
 
 ## License
 

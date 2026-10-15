@@ -1,0 +1,37 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Race-enabled tests
+        run: go test -race ./...
+
+      - name: Build
+        run: go build ./...
+
+      - name: Dependency vulnerability audit
+        # Scan with the go.mod toolchain installed by setup-go (no auto-switch), pinned govulncheck.
+        env:
+          GOTOOLCHAIN: local
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
+
+      - name: Docker build
+        run: docker build -t surge-host:ci .

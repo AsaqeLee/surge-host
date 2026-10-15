@@ -1,6 +1,11 @@
 # surge-host
 
-[中文文档](README.zh-CN.md)
+English | [简体中文](README.zh-CN.md)
+
+[![CI](https://github.com/AsaqeLee/surge-host/actions/workflows/ci.yml/badge.svg)](https://github.com/AsaqeLee/surge-host/actions/workflows/ci.yml)
+[![Go version](https://img.shields.io/github/go-mod/go-version/AsaqeLee/surge-host)](go.mod)
+[![License: MIT](https://img.shields.io/github/license/AsaqeLee/surge-host)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/AsaqeLee/surge-host)](https://github.com/AsaqeLee/surge-host/commits/main)
 
 Self-hosted Go service for hosting, versioning, and validating proxy configuration files. Deliver Surge, Loon, Meta/Mihomo, and sing-box configs through stable Raw URLs.
 
@@ -35,9 +40,30 @@ Proxy rules and client configs need a stable plain-text HTTP endpoint—no HTML 
 
 Validation is heuristic, not a full upstream schema parser.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    C[Proxy clients<br/>Surge / Loon / Mihomo / sing-box] -->|GET /raw/user/path| MW
+    B[Browser Web UI] -->|pages + /api/*| MW
+    MW[Middleware<br/>Recovery → Logging → CORS] --> MUX[net/http ServeMux]
+    MUX --> RAW[Raw handler]
+    MUX --> PAGES[Home / page handlers<br/>html/template]
+    MUX --> AUTHH[POST /api/auth/login]
+    MUX --> RA{{RequireAuth<br/>JWT Bearer}}
+    RA --> API[File API<br/>files · validate · git log/show/restore]
+    API --> VAL[pkg/validator]
+    API --> FS[internal/store FileStore]
+    FS --> DISK[(Data dir<br/>files on disk)]
+    FS --> DB[(SQLite<br/>modernc.org/sqlite)]
+    FS --> VCS[internal/vcs<br/>git CLI]
+    RAW --> DISK
+    MUX --> HZ[GET /healthz] --> DB
+```
+
 ## Requirements
 
-- Go 1.22+ for local builds
+- Go 1.26+ for local builds (see `go.mod`)
 - Docker / Docker Compose for the recommended deploy path
 - SQLite (embedded) and optional Git tooling as used by the service
 
@@ -131,6 +157,15 @@ web/
 docker-compose.yml
 Dockerfile
 ```
+
+## Tests
+
+```bash
+go vet ./...
+go test -race ./...
+```
+
+CI (`.github/workflows/ci.yml`) runs vet, race tests, build, pinned `govulncheck`, and a Docker build on every push to `main`.
 
 ## Status / limitations
 
