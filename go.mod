@@ -2,6 +2,8 @@ module github.com/asaqe/surge-host
 
 go 1.26
 
+toolchain go1.26.9
+
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	modernc.org/sqlite v1.46.1
